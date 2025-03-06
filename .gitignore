@@ -1,5 +1,71 @@
-# Created by https://www.toptal.com/developers/gitignore/api/macos,windows,intellij+all,visualstudiocode,java
-# Edit at https://www.toptal.com/developers/gitignore?templates=macos,windows,intellij+all,visualstudiocode,java
+# Created by https://www.toptal.com/developers/gitignore/api/intellij+all,eclipse,gradle,maven,java,macos,windows,visualstudiocode
+# Edit at https://www.toptal.com/developers/gitignore?templates=intellij+all,eclipse,gradle,maven,java,macos,windows,visualstudiocode
+
+### Eclipse ###
+.metadata
+bin/
+tmp/
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+.settings/
+.loadpath
+.recommenders
+
+# External tool builders
+.externalToolBuilders/
+
+# Locally stored "Eclipse launch configurations"
+*.launch
+
+# PyDev specific (Python IDE for Eclipse)
+*.pydevproject
+
+# CDT-specific (C/C++ Development Tooling)
+.cproject
+
+# CDT- autotools
+.autotools
+
+# Java annotation processor (APT)
+.factorypath
+
+# PDT-specific (PHP Development Tools)
+.buildpath
+
+# sbteclipse plugin
+.target
+
+# Tern plugin
+.tern-project
+
+# TeXlipse plugin
+.texlipse
+
+# STS (Spring Tool Suite)
+.springBeans
+
+# Code Recommenders
+.recommenders/
+
+# Annotation Processing
+.apt_generated/
+.apt_generated_test/
+
+# Scala IDE specific (Scala & Java development for Eclipse)
+.cache-main
+.scala_dependencies
+.worksheet
+
+# Uncomment this line if you wish to ignore the project description file.
+# Typically, this file would be tracked if it contains build/dependency configurations:
+#.project
+
+### Eclipse Patch ###
+# Spring Boot Tooling
+.sts4-cache/
 
 ### Intellij+all ###
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio, WebStorm and Rider
@@ -95,6 +161,8 @@ fabric.properties
 
 # Log file
 *.log
+logs/
+*.log.*
 
 # BlueJ files
 *.ctxt
@@ -148,6 +216,25 @@ Temporary Items
 # iCloud generated files
 *.icloud
 
+### Maven ###
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+# https://github.com/takari/maven-wrapper#usage-without-binary-jar
+.mvn/wrapper/maven-wrapper.jar
+
+# Eclipse m2e generated files
+# Eclipse Core
+.project
+# JDT-specific (Eclipse Java Development Tools)
+.classpath
+
 ### VisualStudioCode ###
 .vscode/*
 !.vscode/settings.json
@@ -193,8 +280,33 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
-# application.yml
+### Gradle ###
+.gradle
+**/build/
+!src/**/build/
+
+# Ignore Gradle GUI config
+gradle-app.setting
+
+# Avoid ignoring Gradle wrapper jar file (.jar files are usually ignored)
+!gradle-wrapper.jar
+
+# Avoid ignore Gradle wrappper properties
+!gradle-wrapper.properties
+
+# Cache of project
+.gradletasknamecache
+
+# Eclipse Gradle plugin generated files
+# Eclipse Core
+# JDT-specific (Eclipse Java Development Tools)
+
+### Gradle Patch ###
+# Java heap dump
+*.hprof
+
+### application ###
 *.yml
 *.properties
 
-# End of https://www.toptal.com/developers/gitignore/api/macos,windows,intellij+all,visualstudiocode,java
+# End of https://www.toptal.com/developers/gitignore/api/intellij+all,eclipse,gradle,maven,java,macos,windows,visualstudiocode
