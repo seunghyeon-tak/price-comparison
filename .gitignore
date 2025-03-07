@@ -309,4 +309,8 @@ gradle-app.setting
 *.yml
 *.properties
 
+### flyway ###
+flyway-history.log
+flyway_schema_history
+
 # End of https://www.toptal.com/developers/gitignore/api/intellij+all,eclipse,gradle,maven,java,macos,windows,visualstudiocode
