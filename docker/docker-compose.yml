@@ -13,6 +13,12 @@ services:
       - ../docker/mysql/data:/var/lib/mysql
     networks:
       - app_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-urrot", "-p$MYSQL_ROOT_PASSWORD"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
 
   spring-app:
     build:
@@ -22,10 +28,19 @@ services:
     restart: always
     env_file:
       - ../env/.env.local
+    ports:
+      - "8080:8080"
     depends_on:
       - mysql
     networks:
       - app_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
 
 networks:
   app_network:
+    driver: bridge
