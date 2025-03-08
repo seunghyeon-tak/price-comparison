@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: price_comparison_mysql
+    restart: always
+    env_file:
+      - ../env/.env.local
+    ports:
+      - "3306:3306"
+    volumes:
+      - ../docker/mysql/data:/var/lib/mysql
+    networks:
+      - app_network
+
+  spring-app:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    container_name: price_comparison_spring
+    restart: always
+    env_file:
+      - ../env/.env.local
+    depends_on:
+      - mysql
+    networks:
+      - app_network
+
+networks:
+  app_network:

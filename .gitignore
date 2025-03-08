@@ -307,6 +307,7 @@ gradle-app.setting
 
 ### application ###
 application.yml
+application-*.yml
 application.properties
 
 ### flyway ###
@@ -316,5 +317,8 @@ flyway_schema_history
 ### env ###
 env/.env*
 !env/.env.template
+
+### docker ###
+docker/mysql/data
 
 # End of https://www.toptal.com/developers/gitignore/api/intellij+all,eclipse,gradle,maven,java,macos,windows,visualstudiocode
