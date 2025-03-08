@@ -306,11 +306,15 @@ gradle-app.setting
 *.hprof
 
 ### application ###
-*.yml
-*.properties
+application.yml
+application.properties
 
 ### flyway ###
 flyway-history.log
 flyway_schema_history
+
+### env ###
+env/.env*
+!env/.env.template
 
 # End of https://www.toptal.com/developers/gitignore/api/intellij+all,eclipse,gradle,maven,java,macos,windows,visualstudiocode
