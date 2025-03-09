@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 public class StoreEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @Column(length = 45, nullable = false)
     private String name;

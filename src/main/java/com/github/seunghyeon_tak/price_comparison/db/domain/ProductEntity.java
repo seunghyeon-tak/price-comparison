@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 public class ProductEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "store_id", nullable = false)
@@ -28,6 +28,7 @@ public class ProductEntity {
     @Column(nullable = false, length = 45)
     private String name;
 
+    @Column(length = 255, nullable = true)
     private String purchaseUrl;
 
     @Lob

@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 public class CategoryEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @Column(length = 45)
     private String name;

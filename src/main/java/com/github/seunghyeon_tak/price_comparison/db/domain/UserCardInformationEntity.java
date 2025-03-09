@@ -17,7 +17,7 @@ import java.math.BigDecimal;
 public class UserCardInformationEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
@@ -26,6 +26,6 @@ public class UserCardInformationEntity {
     @Column(nullable = false, length = 45)
     private String name;
 
-    @Column(precision = 10, scale = 2)
+    @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal discountRate;
 }

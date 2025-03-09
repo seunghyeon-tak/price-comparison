@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 public class PriceAlertsEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
@@ -31,9 +31,9 @@ public class PriceAlertsEntity {
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal targetPrice;
 
-    @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    @Column(nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime createdAt;
 
-    @Column(columnDefinition = "TINYINT(1) DEFAULT 1")
+    @Column(nullable = false, columnDefinition = "TINYINT(1) DEFAULT 1")
     private Boolean isActive;
 }
