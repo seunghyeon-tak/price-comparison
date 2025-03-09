@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 public class ProductImagesEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "product_id", nullable = false)
@@ -24,6 +24,6 @@ public class ProductImagesEntity {
     @Column(nullable = false)
     private String url;
 
-    @Column(columnDefinition = "TINYINT(0) DEFAULT 0")
+    @Column(nullable = false, columnDefinition = "TINYINT(0) DEFAULT 0")
     private Boolean isMain;
 }
