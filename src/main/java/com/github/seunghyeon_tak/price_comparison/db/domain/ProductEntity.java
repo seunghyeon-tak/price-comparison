@@ -31,7 +31,6 @@ public class ProductEntity {
     @Column(length = 255, nullable = true)
     private String purchaseUrl;
 
-    @Lob
-    @Column(columnDefinition = "TEXT")
+    @Column(length = 1000)
     private String description;
 }
