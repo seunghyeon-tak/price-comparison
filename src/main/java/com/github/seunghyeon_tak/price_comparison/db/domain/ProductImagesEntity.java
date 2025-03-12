@@ -24,6 +24,6 @@ public class ProductImagesEntity {
     @Column(nullable = false)
     private String url;
 
-    @Column(nullable = false, columnDefinition = "TINYINT(0) DEFAULT 0")
+    @Column(nullable = false, columnDefinition = "TINYINT(1) DEFAULT 0")
     private Boolean isMain;
 }
