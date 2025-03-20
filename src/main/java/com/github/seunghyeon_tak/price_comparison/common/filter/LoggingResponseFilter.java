@@ -1,5 +1,7 @@
 package com.github.seunghyeon_tak.price_comparison.common.filter;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,6 +17,9 @@ import java.util.UUID;
 
 @Slf4j
 public class LoggingResponseFilter extends OncePerRequestFilter {
+    private static final ObjectMapper objectMapper = new ObjectMapper()
+            .enable(SerializationFeature.INDENT_OUTPUT);
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         ContentCachingResponseWrapper responseWrapper = new ContentCachingResponseWrapper(response);
@@ -36,12 +41,22 @@ public class LoggingResponseFilter extends OncePerRequestFilter {
             byte[] content = responseWrapper.getContentAsByteArray();
             if (content.length > 0) {
                 String responseBody = new String(content, responseWrapper.getCharacterEncoding() != null ? responseWrapper.getCharacterEncoding() : StandardCharsets.UTF_8.name());
-                log.info("REQ_ID : {} | USER_ID : {} | 응답 바디 : {}", requestId, userId, responseBody);
+                String prettyResponseBody = formatJson(responseBody);
+                log.info("REQ_ID : {} | USER_ID : {} | 응답 바디 : {}", requestId, userId, prettyResponseBody);
             }
 
             responseWrapper.copyBodyToResponse();
         } finally {
             MDC.clear();
+        }
+    }
+
+    private String formatJson(String json) {
+        try {
+            Object jsonObject = objectMapper.readValue(json, Object.class);
+            return objectMapper.writeValueAsString(jsonObject);
+        } catch (Exception e) {
+            return json;
         }
     }
 }

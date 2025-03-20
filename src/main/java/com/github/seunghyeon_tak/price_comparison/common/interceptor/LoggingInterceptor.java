@@ -12,8 +12,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 public class LoggingInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        long startTime = System.currentTimeMillis();
-        request.setAttribute("startTime", startTime);
+        request.setAttribute("startTime", System.nanoTime());
 
         log.info("요청 시작 : REQ_ID : {} | USER_ID : {} | [{}] {} | IP: {}",
                 MDC.get("REQ_ID"), MDC.get("USER_ID"), request.getMethod(), request.getRequestURI(), request.getRemoteAddr());
@@ -24,11 +23,11 @@ public class LoggingInterceptor implements HandlerInterceptor {
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
         long startTime = (long) request.getAttribute("startTime");
-        long endTime = System.currentTimeMillis();
-        long duration = endTime - startTime;
+        long endTime = System.nanoTime();
+        long executionTimeMs = (endTime - startTime) / 1_000_000;
 
         log.info("응답 완료 : REQ_ID : {} | USER_ID : {} | [{}] {} | 상태 코드: {} | 실행 시간: {}ms",
-                MDC.get("REQ_ID"), MDC.get("USER_ID"), request.getMethod(), request.getRequestURI(), response.getStatus(), duration);
+                MDC.get("REQ_ID"), MDC.get("USER_ID"), request.getMethod(), request.getRequestURI(), response.getStatus(), executionTimeMs);
 
         if (ex != null) {
             log.error("예외 발생 : REQ_ID : {} | USER_ID : {} | [{}] {} | ERROR : {}",
