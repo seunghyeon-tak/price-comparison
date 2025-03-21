@@ -7,16 +7,16 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "categorys")
+@Table(name = "nouns")
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 @Builder
-public class CategoryEntity {
+public class NounsEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(length = 45)
-    private String name;
+    @Column(length = 100, nullable = false, unique = true)
+    private String word;
 }
