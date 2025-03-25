@@ -31,7 +31,7 @@ public class UserApiController {
     @PostMapping("/public/login")
     @ControllerLoggable("로그인 컨트롤러")
     public Api<UserLoginResponse> login(@RequestBody @Valid UserLoginRequest request) {
-        userApiBusiness.login(request);
-        return Api.success(token);
+        UserLoginResponse response = userApiBusiness.login(request);
+        return Api.success(response);
     }
 }

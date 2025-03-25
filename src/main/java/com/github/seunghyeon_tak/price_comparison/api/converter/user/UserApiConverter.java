@@ -22,7 +22,7 @@ public class UserApiConverter {
 
     public UserLoginResponse toResponse(String token) {
         return UserLoginResponse.builder()
-                .token(token)
+                .accessToken(token)
                 .build();
     }
 }
