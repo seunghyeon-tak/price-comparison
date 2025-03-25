@@ -1,8 +1,11 @@
 package com.github.seunghyeon_tak.price_comparison.api.controller.user;
 
 import com.github.seunghyeon_tak.price_comparison.api.business.user.UserApiBusiness;
+import com.github.seunghyeon_tak.price_comparison.api.converter.user.UserApiConverter;
 import com.github.seunghyeon_tak.price_comparison.common.annotation.ControllerLoggable;
+import com.github.seunghyeon_tak.price_comparison.common.dto.api.request.user.UserLoginRequest;
 import com.github.seunghyeon_tak.price_comparison.common.dto.api.request.user.UserSignupRequest;
+import com.github.seunghyeon_tak.price_comparison.common.dto.api.response.user.UserLoginResponse;
 import com.github.seunghyeon_tak.price_comparison.common.response.Api;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -23,5 +26,12 @@ public class UserApiController {
         userApiBusiness.signup(request);
 
         return Api.success();
+    }
+
+    @PostMapping("/public/login")
+    @ControllerLoggable("로그인 컨트롤러")
+    public Api<UserLoginResponse> login(@RequestBody @Valid UserLoginRequest request) {
+        userApiBusiness.login(request);
+        return Api.success(token);
     }
 }
