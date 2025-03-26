@@ -2,6 +2,7 @@ package com.github.seunghyeon_tak.price_comparison.api.business.user;
 
 import com.github.seunghyeon_tak.price_comparison.api.converter.user.UserApiConverter;
 import com.github.seunghyeon_tak.price_comparison.api.service.user.UserApiService;
+import com.github.seunghyeon_tak.price_comparison.api.service.user.dto.LoginInfo;
 import com.github.seunghyeon_tak.price_comparison.common.annotation.Business;
 import com.github.seunghyeon_tak.price_comparison.common.annotation.BusinessLoggable;
 import com.github.seunghyeon_tak.price_comparison.common.annotation.LogException;
@@ -29,9 +30,7 @@ public class UserApiBusiness {
 
     @BusinessLoggable("로그인 비지니스")
     @LogException
-    public UserLoginResponse login(UserLoginRequest request) {
-        String token = userApiService.login(request);
-        UserLoginResponse response = userApiConverter.toResponse(token);
-        return response;
+    public LoginInfo login(UserLoginRequest request) {
+        return userApiService.login(request);
     }
 }

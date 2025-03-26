@@ -1,6 +1,6 @@
-package com.github.seunghyeon_tak.price_comparison.common.response;
+package com.github.seunghyeon_tak.price_comparison.common.exception.response;
 
-import com.github.seunghyeon_tak.price_comparison.common.response.enums.base.ResponseCodeIfs;
+import com.github.seunghyeon_tak.price_comparison.common.exception.response.enums.base.ResponseCodeIfs;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

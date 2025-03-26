@@ -1,7 +1,7 @@
 package com.github.seunghyeon_tak.price_comparison.common.exception;
 
-import com.github.seunghyeon_tak.price_comparison.common.response.Api;
-import com.github.seunghyeon_tak.price_comparison.common.response.enums.base.ApiResponseCode;
+import com.github.seunghyeon_tak.price_comparison.common.exception.response.Api;
+import com.github.seunghyeon_tak.price_comparison.common.exception.response.enums.base.ApiResponseCode;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.core.annotation.Order;

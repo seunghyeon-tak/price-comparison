@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
-import java.util.Base64;
 import java.util.Date;
 
 @Component
@@ -18,18 +17,34 @@ public class JwtProvider {
 
     private final Key key;
     private final long accessTokenValidityInMs;
+    private final long refreshTokenValidityInMs;
 
     public JwtProvider(
             @Value("${jwt.secret}") String secret,
-            @Value("${jwt.access-token-validity-in-ms}") long accessTokenValidityInMs
+            @Value("${jwt.access-token-validity-in-ms}") long accessTokenValidityInMs,
+            @Value("${jwt.refresh-token-validity-in-ms}") long refreshTokenValidityInMs
     ) {
         this.key = Keys.hmacShaKeyFor(secret.getBytes());
         this.accessTokenValidityInMs = accessTokenValidityInMs;
+        this.refreshTokenValidityInMs = refreshTokenValidityInMs;
     }
 
     public String generateAccessToken(Long userId, String email) {
         Date now = new Date();
         Date expiry = new Date(now.getTime() + accessTokenValidityInMs);
+
+        return Jwts.builder()
+                .setSubject(userId.toString())
+                .claim("email", email)
+                .setIssuedAt(now)
+                .setExpiration(expiry)
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    public String generateRefreshToken(Long userId, String email) {
+        Date now = new Date();
+        Date expiry = new Date(now.getTime() + 1000L * 60 * 60 * 24 * 7);
 
         return Jwts.builder()
                 .setSubject(userId.toString())
@@ -55,5 +70,19 @@ public class JwtProvider {
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
+    }
+
+    public long getRefreshTokenValidityInMillis() {
+        return refreshTokenValidityInMs;
+    }
+
+    public boolean isTokenExpired(String token) {
+        try {
+            return getClaims(token)
+                    .getExpiration()
+                    .before(new Date());
+        } catch (Exception e) {
+            return true;
+        }
     }
 }

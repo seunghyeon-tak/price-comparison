@@ -1,4 +1,4 @@
-package com.github.seunghyeon_tak.price_comparison.common.response.enums.base;
+package com.github.seunghyeon_tak.price_comparison.common.exception.response.enums.base;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

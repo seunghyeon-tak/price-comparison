@@ -3,7 +3,7 @@ package com.github.seunghyeon_tak.price_comparison.api.controller.example;
 import com.github.seunghyeon_tak.price_comparison.common.annotation.ControllerLoggable;
 import com.github.seunghyeon_tak.price_comparison.common.dto.api.request.example.DtoRequest;
 import com.github.seunghyeon_tak.price_comparison.common.dto.api.response.example.DtoResponse;
-import com.github.seunghyeon_tak.price_comparison.common.response.Api;
+import com.github.seunghyeon_tak.price_comparison.common.exception.response.Api;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
