@@ -2,6 +2,7 @@ package com.github.seunghyeon_tak.price_comparison.config;
 
 import com.github.seunghyeon_tak.price_comparison.common.security.jwt.JwtProvider;
 import com.github.seunghyeon_tak.price_comparison.common.security.jwt.filter.JwtAuthenticationFilter;
+import com.github.seunghyeon_tak.price_comparison.common.security.jwt.handler.JwtAuthenticationEntryPoint;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,15 +18,23 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final JwtProvider jwtProvider;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .csrf(csrf -> csrf.disable())
+                .exceptionHandling(ex ->
+                        ex.authenticationEntryPoint(jwtAuthenticationEntryPoint)
+                )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/test").permitAll()
-                        .requestMatchers("/actuator/health").permitAll()
-                        .requestMatchers("/api/v1/user/public/**").permitAll()
+                        .requestMatchers(
+                                "/api/test",
+                                "/actuator/health",
+                                "/api/v1/auth/refresh",
+                                "/api/v1/user/public/**"
+                        )
+                        .permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(new JwtAuthenticationFilter(jwtProvider), UsernamePasswordAuthenticationFilter.class)

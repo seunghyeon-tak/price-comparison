@@ -4,7 +4,7 @@ import com.github.seunghyeon_tak.price_comparison.api.converter.user.UserApiConv
 import com.github.seunghyeon_tak.price_comparison.api.service.user.UserApiService;
 import com.github.seunghyeon_tak.price_comparison.common.dto.api.request.user.UserSignupRequest;
 import com.github.seunghyeon_tak.price_comparison.common.exception.ApiException;
-import com.github.seunghyeon_tak.price_comparison.common.response.enums.user.UserResponseCode;
+import com.github.seunghyeon_tak.price_comparison.common.exception.response.enums.user.UserResponseCode;
 import com.github.seunghyeon_tak.price_comparison.db.domain.UserEntity;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

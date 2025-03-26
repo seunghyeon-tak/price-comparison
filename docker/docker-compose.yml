@@ -20,6 +20,15 @@ services:
       retries: 3
       start_period: 20s
 
+  redis:
+    image: redis:7.0
+    container_name: price_comparison_redis
+    restart: always
+    ports:
+      - "6379:6379"
+    networks:
+      - app_network
+
   spring-app:
     build:
       context: ..
@@ -32,6 +41,7 @@ services:
       - "8080:8080"
     depends_on:
       - mysql
+      - redis
     networks:
       - app_network
     healthcheck:

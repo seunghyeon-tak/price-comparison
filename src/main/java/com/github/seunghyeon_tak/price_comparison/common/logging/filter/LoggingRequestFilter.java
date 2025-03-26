@@ -1,4 +1,4 @@
-package com.github.seunghyeon_tak.price_comparison.common.filter;
+package com.github.seunghyeon_tak.price_comparison.common.logging.filter;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
