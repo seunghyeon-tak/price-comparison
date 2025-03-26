@@ -9,6 +9,5 @@ import lombok.Data;
 @Builder
 public class UserLoginResponse {
     private final String accessToken;
-    private final String refreshToken;
     private final UserInfoDto user;
 }

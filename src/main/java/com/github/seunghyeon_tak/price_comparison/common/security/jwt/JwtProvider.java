@@ -17,13 +17,16 @@ public class JwtProvider {
 
     private final Key key;
     private final long accessTokenValidityInMs;
+    private final long refreshTokenValidityInMs;
 
     public JwtProvider(
             @Value("${jwt.secret}") String secret,
-            @Value("${jwt.access-token-validity-in-ms}") long accessTokenValidityInMs
+            @Value("${jwt.access-token-validity-in-ms}") long accessTokenValidityInMs,
+            @Value("${jwt.refresh-token-validity-in-ms}") long refreshTokenValidityInMs
     ) {
         this.key = Keys.hmacShaKeyFor(secret.getBytes());
         this.accessTokenValidityInMs = accessTokenValidityInMs;
+        this.refreshTokenValidityInMs = refreshTokenValidityInMs;
     }
 
     public String generateAccessToken(Long userId, String email) {
@@ -67,5 +70,9 @@ public class JwtProvider {
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
+    }
+
+    public long getRefreshTokenValidityInMillis() {
+        return refreshTokenValidityInMs;
     }
 }

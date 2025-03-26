@@ -1,6 +1,8 @@
 package com.github.seunghyeon_tak.price_comparison.api.service.user;
 
+import com.github.seunghyeon_tak.price_comparison.api.service.auth.RefreshTokenService;
 import com.github.seunghyeon_tak.price_comparison.api.service.nickname.NicknameGenerator;
+import com.github.seunghyeon_tak.price_comparison.api.service.user.dto.LoginInfo;
 import com.github.seunghyeon_tak.price_comparison.common.dto.api.request.user.UserLoginRequest;
 import com.github.seunghyeon_tak.price_comparison.common.exception.ApiException;
 import com.github.seunghyeon_tak.price_comparison.common.response.enums.user.UserResponseCode;
@@ -19,6 +21,7 @@ public class UserApiService {
     private final PasswordEncoder passwordEncoder;
     private final NicknameGenerator nicknameGenerator;
     private final JwtProvider jwtProvider;
+    private final RefreshTokenService refreshTokenService;
 
     public void duplicateEmail(String email) {
         if (userRepository.findByEmail(email).isPresent()) {
@@ -37,7 +40,7 @@ public class UserApiService {
         userRepository.save(userEntity);
     }
 
-    public String login(UserLoginRequest request) {
+    public LoginInfo login(UserLoginRequest request) {
         UserEntity user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new ApiException(UserResponseCode.EMAIL_NOT_EXIST));
 
@@ -45,8 +48,21 @@ public class UserApiService {
             throw new ApiException(UserResponseCode.USER_PASSWORD_WRONG);
         }
 
-        jwtProvider.generateAccessToken(user.getId(), user.getEmail());
-        jwtProvider.generateRefreshToken(user.getId(), user.getEmail());
+        String accessToken = jwtProvider.generateAccessToken(user.getId(), user.getEmail());
+        String refreshToken = jwtProvider.generateRefreshToken(user.getId(), user.getEmail());
+
+        // redis 저장
+        long refreshTokenExpiry = jwtProvider.getRefreshTokenValidityInMillis();
+        refreshTokenService.save(user.getId(), refreshToken, refreshTokenExpiry);
+
+        return LoginInfo.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .userId(user.getId())
+                .email(user.getEmail())
+                .nickname(user.getNickname())
+                .alertType(user.getAlertType())
+                .build();
     }
 
 }
