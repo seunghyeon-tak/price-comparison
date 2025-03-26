@@ -1,4 +1,4 @@
-package com.github.seunghyeon_tak.price_comparison.common.filter;
+package com.github.seunghyeon_tak.price_comparison.common.logging.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;

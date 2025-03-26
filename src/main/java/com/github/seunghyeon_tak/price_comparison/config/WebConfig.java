@@ -1,8 +1,8 @@
 package com.github.seunghyeon_tak.price_comparison.config;
 
-import com.github.seunghyeon_tak.price_comparison.common.filter.LoggingRequestFilter;
-import com.github.seunghyeon_tak.price_comparison.common.filter.LoggingResponseFilter;
-import com.github.seunghyeon_tak.price_comparison.common.interceptor.LoggingInterceptor;
+import com.github.seunghyeon_tak.price_comparison.common.logging.filter.LoggingRequestFilter;
+import com.github.seunghyeon_tak.price_comparison.common.logging.filter.LoggingResponseFilter;
+import com.github.seunghyeon_tak.price_comparison.common.logging.interceptor.LoggingInterceptor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;

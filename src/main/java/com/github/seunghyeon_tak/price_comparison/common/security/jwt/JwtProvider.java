@@ -75,4 +75,14 @@ public class JwtProvider {
     public long getRefreshTokenValidityInMillis() {
         return refreshTokenValidityInMs;
     }
+
+    public boolean isTokenExpired(String token) {
+        try {
+            return getClaims(token)
+                    .getExpiration()
+                    .before(new Date());
+        } catch (Exception e) {
+            return true;
+        }
+    }
 }

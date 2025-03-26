@@ -5,7 +5,7 @@ import com.github.seunghyeon_tak.price_comparison.api.service.nickname.NicknameG
 import com.github.seunghyeon_tak.price_comparison.api.service.user.dto.LoginInfo;
 import com.github.seunghyeon_tak.price_comparison.common.dto.api.request.user.UserLoginRequest;
 import com.github.seunghyeon_tak.price_comparison.common.exception.ApiException;
-import com.github.seunghyeon_tak.price_comparison.common.response.enums.user.UserResponseCode;
+import com.github.seunghyeon_tak.price_comparison.common.exception.response.enums.user.UserResponseCode;
 import com.github.seunghyeon_tak.price_comparison.common.security.jwt.JwtProvider;
 import com.github.seunghyeon_tak.price_comparison.db.domain.UserEntity;
 import com.github.seunghyeon_tak.price_comparison.db.enums.AlertType;
@@ -22,6 +22,11 @@ public class UserApiService {
     private final NicknameGenerator nicknameGenerator;
     private final JwtProvider jwtProvider;
     private final RefreshTokenService refreshTokenService;
+
+    public UserEntity getUserId(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new ApiException(UserResponseCode.USER_NOT_FOUND));
+    }
 
     public void duplicateEmail(String email) {
         if (userRepository.findByEmail(email).isPresent()) {

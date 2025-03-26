@@ -7,7 +7,7 @@ import com.github.seunghyeon_tak.price_comparison.common.dto.api.request.user.Us
 import com.github.seunghyeon_tak.price_comparison.common.dto.api.request.user.UserSignupRequest;
 import com.github.seunghyeon_tak.price_comparison.common.dto.api.response.user.UserInfoDto;
 import com.github.seunghyeon_tak.price_comparison.common.dto.api.response.user.UserLoginResponse;
-import com.github.seunghyeon_tak.price_comparison.common.response.Api;
+import com.github.seunghyeon_tak.price_comparison.common.exception.response.Api;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.seunghyeon_tak.price_comparison.api.business.user.UserApiBusiness;
 import com.github.seunghyeon_tak.price_comparison.common.dto.api.request.user.UserSignupRequest;
 import com.github.seunghyeon_tak.price_comparison.common.exception.ApiException;
-import com.github.seunghyeon_tak.price_comparison.common.response.enums.user.UserResponseCode;
+import com.github.seunghyeon_tak.price_comparison.common.exception.response.enums.user.UserResponseCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

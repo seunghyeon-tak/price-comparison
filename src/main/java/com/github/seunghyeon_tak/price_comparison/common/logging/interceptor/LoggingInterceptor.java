@@ -1,4 +1,4 @@
-package com.github.seunghyeon_tak.price_comparison.common.interceptor;
+package com.github.seunghyeon_tak.price_comparison.common.logging.interceptor;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
