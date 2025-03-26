@@ -45,7 +45,8 @@ public class UserApiService {
             throw new ApiException(UserResponseCode.USER_PASSWORD_WRONG);
         }
 
-        return jwtProvider.generateAccessToken(user.getId(), user.getEmail());
+        jwtProvider.generateAccessToken(user.getId(), user.getEmail());
+        jwtProvider.generateRefreshToken(user.getId(), user.getEmail());
     }
 
 }

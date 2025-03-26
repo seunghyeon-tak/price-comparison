@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
-import java.util.Base64;
 import java.util.Date;
 
 @Component
@@ -30,6 +29,19 @@ public class JwtProvider {
     public String generateAccessToken(Long userId, String email) {
         Date now = new Date();
         Date expiry = new Date(now.getTime() + accessTokenValidityInMs);
+
+        return Jwts.builder()
+                .setSubject(userId.toString())
+                .claim("email", email)
+                .setIssuedAt(now)
+                .setExpiration(expiry)
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    public String generateRefreshToken(Long userId, String email) {
+        Date now = new Date();
+        Date expiry = new Date(now.getTime() + 1000L * 60 * 60 * 24 * 7);
 
         return Jwts.builder()
                 .setSubject(userId.toString())
