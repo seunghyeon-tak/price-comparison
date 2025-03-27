@@ -1,4 +1,4 @@
-package com.github.seunghyeon_tak.price_comparison.api.service.auth.dto;
+package com.github.seunghyeon_tak.price_comparison.external.kakao.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
