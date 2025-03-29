@@ -7,6 +7,7 @@ import org.slf4j.MDC;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -31,5 +32,20 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(Api.error(ApiResponseCode.INTERNAL_SERVER_ERROR, exception.getMessage()));
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Api<Void>> handleMethodArgumentNotValid(MethodArgumentNotValidException exception) {
+        String message = exception.getBindingResult().getFieldErrors().stream()
+                .map(fieldError -> fieldError.getField() + " : " + fieldError.getDefaultMessage())
+                .findFirst()
+                .orElse("Validation failed");
+
+        log.warn("Validation Error >>> REQ_ID : {} | USER_ID : {} | message : {}",
+                MDC.get("REQ_ID"), MDC.get("USER_ID"), message);
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(Api.error(ApiResponseCode.INVALID_PARAMETER, message));
     }
 }

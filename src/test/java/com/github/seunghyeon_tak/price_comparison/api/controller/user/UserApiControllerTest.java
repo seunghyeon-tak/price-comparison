@@ -14,8 +14,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -29,17 +28,24 @@ class UserApiControllerTest {
     @MockBean
     private UserApiBusiness userApiBusiness;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     @Test
     @DisplayName("회원가입_API_호출_성공")
     void test1() throws Exception {
+        // given
         UserSignupRequest request = UserSignupRequest.builder()
                 .email("test@test.com")
                 .password("password1234")
                 .build();
 
+        doNothing().when(userApiBusiness).signup(request);
+
+        // when & when
         mockMvc.perform(post("/api/v1/user/public/signup")
                         .contentType("application/json")
-                        .content(new ObjectMapper().writeValueAsString(request)))
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.result.resultCode").value(200))
                 .andExpect(jsonPath("$.result.resultMessage").value("success"))
@@ -52,6 +58,7 @@ class UserApiControllerTest {
     @Test
     @DisplayName("회원가입_API_호출_이메일_중복")
     void test2() throws Exception {
+        // given
         UserSignupRequest request = UserSignupRequest.builder()
                 .email("duplicate@test.com")
                 .password("password1234")
@@ -60,9 +67,10 @@ class UserApiControllerTest {
         doThrow(new ApiException(UserResponseCode.USER_EMAIL_DUPLICATE))
                 .when(userApiBusiness).signup(any(UserSignupRequest.class));
 
+        // when & then
         mockMvc.perform(post("/api/v1/user/public/signup")
                         .contentType("application/json")
-                        .content(new ObjectMapper().writeValueAsString(request)))
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.result.resultCode").value(1000))
                 .andExpect(jsonPath("$.result.resultMessage").value("중복된 이메일 입니다."))
