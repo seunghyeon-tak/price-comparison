@@ -13,7 +13,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -40,14 +41,18 @@ class UserApiBusinessTest {
                 .password("password1234")
                 .build();
 
-        given(userApiConverter.toEntity(request)).willReturn(user);
+//        given(userApiConverter.toEntity(request)).willReturn(user);
+        doNothing().when(userApiService).duplicateEmail("test@test.com");
+        when(userApiConverter.toEntity(any(UserSignupRequest.class))).thenReturn(user);
+        doNothing().when(userApiService).save(user);
 
         // when
         userApiBusiness.signup(request);
 
         // then
-        then(userApiService).should().duplicateEmail(request.getEmail());
-        then(userApiService).should().save(user);
+        verify(userApiService).duplicateEmail(request.getEmail());
+        verify(userApiConverter).toEntity(request);
+        verify(userApiService).save(user);
     }
 
     @Test
@@ -59,13 +64,18 @@ class UserApiBusinessTest {
                 .password("password1234")
                 .build();
 
-        willThrow(new ApiException(UserResponseCode.USER_EMAIL_DUPLICATE))
-                .given(userApiService).duplicateEmail(request.getEmail());
+        doThrow(new ApiException(UserResponseCode.USER_EMAIL_DUPLICATE))
+                .when(userApiService).duplicateEmail("duplicate@test.com");
 
         // when & then
-        assertThatThrownBy(() -> userApiBusiness.signup(request))
-                .isInstanceOf(ApiException.class)
-                .hasMessageContaining(UserResponseCode.USER_EMAIL_DUPLICATE.getDescription());
+        ApiException apiException = assertThrows(ApiException.class, () -> {
+            userApiBusiness.signup(request);
+        });
+
+        assertThat(apiException.getErrorDescription())
+                .isEqualTo(UserResponseCode.USER_EMAIL_DUPLICATE.getDescription());
+
+        verify(userApiService).duplicateEmail("duplicate@test.com");
     }
 
 }

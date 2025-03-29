@@ -37,6 +37,9 @@ public class UserEntity {
     @Enumerated(EnumType.STRING)
     private AlertType alertType;
 
+    @Column(nullable = false)
+    private Boolean isActive;
+
     @CreatedDate
     @Column(updatable = false)
     private LocalDateTime createdAt;
