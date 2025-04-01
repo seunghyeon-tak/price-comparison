@@ -5,11 +5,16 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "products")
 @AllArgsConstructor
 @NoArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
 @Data
 @Builder
 public class ProductEntity {
@@ -33,4 +38,11 @@ public class ProductEntity {
 
     @Column(length = 1000)
     private String description;
+
+    @Column(nullable = false)
+    private Boolean isActive;
+
+    @CreatedDate
+    @Column(nullable = false)
+    private LocalDateTime createdAt;
 }

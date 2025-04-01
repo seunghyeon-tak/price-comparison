@@ -43,6 +43,7 @@ public class UserApiService {
                     .password(UUID.randomUUID().toString())  // 임시 비번
                     .nickname(nicknameGenerator.generate())
                     .alertType(AlertType.NONE)
+                    .isActive(true)
                     .build();
             return userRepository.save(newUser);
         });
@@ -68,6 +69,7 @@ public class UserApiService {
         userEntity.setPassword(passwordEncoder.encode(userEntity.getPassword()));
         userEntity.setNickname(nicknameGenerator.generate());
         userEntity.setAlertType(AlertType.NONE);
+        userEntity.setIsActive(true);
         userRepository.save(userEntity);
     }
 
