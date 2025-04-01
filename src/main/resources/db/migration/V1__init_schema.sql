@@ -1,16 +1,19 @@
-CREATE TABLE IF NOT EXISTS `user`
+CREATE TABLE IF NOT EXISTS `users`
 (
     `id`         BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     `email`      VARCHAR(100)    NOT NULL,
     `password`   VARCHAR(255)    NOT NULL,
     `nickname`   VARCHAR(45)     NULL,
     `alert_type` VARCHAR(45)     NULL,
-    PRIMARY KEY (`id`),
+    `is_active`  TINYINT(1)      NOT NULL DEFAULT 0,
+    `created_at` DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        PRIMARY KEY (`id`),
     UNIQUE INDEX `email_UNIQUE` (`email` ASC) VISIBLE
 )
     ENGINE = InnoDB;
 
-CREATE TABLE IF NOT EXISTS `user_card_information`
+CREATE TABLE IF NOT EXISTS `user_cards`
 (
     `id`            BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     `name`          VARCHAR(45)     NOT NULL,
@@ -20,13 +23,13 @@ CREATE TABLE IF NOT EXISTS `user_card_information`
     INDEX `fk_user_card_information_user_idx` (`user_id` ASC) VISIBLE,
     CONSTRAINT `fk_user_card_information_user`
         FOREIGN KEY (`user_id`)
-            REFERENCES `user` (`id`)
+            REFERENCES `users` (`id`)
             ON DELETE NO ACTION
             ON UPDATE NO ACTION
 )
     ENGINE = InnoDB;
 
-CREATE TABLE IF NOT EXISTS `store`
+CREATE TABLE IF NOT EXISTS `stores`
 (
     `id`   BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(45)     NOT NULL,
@@ -34,7 +37,7 @@ CREATE TABLE IF NOT EXISTS `store`
 )
     ENGINE = InnoDB;
 
-CREATE TABLE IF NOT EXISTS `category`
+CREATE TABLE IF NOT EXISTS `categories`
 (
     `id`   BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(45)     NULL,
@@ -42,25 +45,27 @@ CREATE TABLE IF NOT EXISTS `category`
 )
     ENGINE = InnoDB;
 
-CREATE TABLE IF NOT EXISTS `product`
+CREATE TABLE IF NOT EXISTS `products`
 (
     `id`           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     `name`         VARCHAR(45)     NOT NULL,
     `store_id`     BIGINT UNSIGNED NOT NULL,
     `category_id`  BIGINT UNSIGNED NOT NULL,
     `purchase_url` VARCHAR(255)    NULL,
-    `description`  TEXT            NULL,
+    `description`  VARCHAR(1000)   NULL,
+    `is_active`    TINYINT(1)      NOT NULL DEFAULT 1,
+    `created_at`   DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
     INDEX `fk_product_store1_idx` (`store_id` ASC) VISIBLE,
     INDEX `fk_product_category1_idx` (`category_id` ASC) VISIBLE,
     CONSTRAINT `fk_product_store1`
         FOREIGN KEY (`store_id`)
-            REFERENCES `store` (`id`)
+            REFERENCES `stores` (`id`)
             ON DELETE NO ACTION
             ON UPDATE NO ACTION,
     CONSTRAINT `fk_product_category1`
         FOREIGN KEY (`category_id`)
-            REFERENCES `category` (`id`)
+            REFERENCES `categories` (`id`)
             ON DELETE NO ACTION
             ON UPDATE NO ACTION
 )
@@ -79,12 +84,12 @@ CREATE TABLE IF NOT EXISTS `price_alerts`
     INDEX `fk_user_likes_product1_idx` (`product_id` ASC) VISIBLE,
     CONSTRAINT `fk_user_likes_user1`
         FOREIGN KEY (`user_id`)
-            REFERENCES `user` (`id`)
+            REFERENCES `users` (`id`)
             ON DELETE NO ACTION
             ON UPDATE NO ACTION,
     CONSTRAINT `fk_user_likes_product1`
         FOREIGN KEY (`product_id`)
-            REFERENCES `product` (`id`)
+            REFERENCES `products` (`id`)
             ON DELETE NO ACTION
             ON UPDATE NO ACTION
 )
@@ -100,13 +105,13 @@ CREATE TABLE IF NOT EXISTS `product_images`
     INDEX `fk_product_images_product1_idx` (`product_id` ASC) VISIBLE,
     CONSTRAINT `fk_product_images_product1`
         FOREIGN KEY (`product_id`)
-            REFERENCES `product` (`id`)
+            REFERENCES `products` (`id`)
             ON DELETE NO ACTION
             ON UPDATE NO ACTION
 )
     ENGINE = InnoDB;
 
-CREATE TABLE IF NOT EXISTS `product_price`
+CREATE TABLE IF NOT EXISTS `product_prices`
 (
     `id`         BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     `price`      DECIMAL(10, 2)  NOT NULL,
@@ -116,7 +121,7 @@ CREATE TABLE IF NOT EXISTS `product_price`
     INDEX `fk_product_price_product1_idx` (`product_id` ASC) VISIBLE,
     CONSTRAINT `fk_product_price_product1`
         FOREIGN KEY (`product_id`)
-            REFERENCES `product` (`id`)
+            REFERENCES `products` (`id`)
             ON DELETE NO ACTION
             ON UPDATE NO ACTION
 )
@@ -133,13 +138,25 @@ CREATE TABLE IF NOT EXISTS `user_favorites`
     INDEX `fk_user_favorites_product1_idx` (`product_id` ASC) VISIBLE,
     CONSTRAINT `fk_user_favorites_user1`
         FOREIGN KEY (`user_id`)
-            REFERENCES `user` (`id`)
+            REFERENCES `users` (`id`)
             ON DELETE NO ACTION
             ON UPDATE NO ACTION,
     CONSTRAINT `fk_user_favorites_product1`
         FOREIGN KEY (`product_id`)
-            REFERENCES `product` (`id`)
+            REFERENCES `products` (`id`)
             ON DELETE NO ACTION
             ON UPDATE NO ACTION
 )
     ENGINE = InnoDB;
+
+CREATE TABLE adjectives
+(
+    id   BIGINT AUTO_INCREMENT PRIMARY KEY,
+    word VARCHAR(100) NOT NULL UNIQUE
+);
+
+CREATE TABLE nouns
+(
+    id   BIGINT AUTO_INCREMENT PRIMARY KEY,
+    word VARCHAR(100) NOT NULL UNIQUE
+);
