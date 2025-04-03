@@ -1,0 +1,1 @@
+ALTER TABLE products MODIFY purchase_url VARCHAR(1000);

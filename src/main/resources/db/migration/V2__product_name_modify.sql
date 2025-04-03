@@ -1,0 +1,1 @@
+ALTER TABLE products MODIFY name VARCHAR(255);
