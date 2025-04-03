@@ -30,10 +30,10 @@ public class ProductEntity {
     @JoinColumn(name = "category_id", nullable = false)
     private CategoryEntity category;
 
-    @Column(nullable = false, length = 45)
+    @Column(nullable = false, length = 255)
     private String name;
 
-    @Column(length = 255, nullable = true)
+    @Column(nullable = true, columnDefinition = "TEXT")
     private String purchaseUrl;
 
     @Column(length = 1000)
