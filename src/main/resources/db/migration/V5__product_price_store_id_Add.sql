@@ -1,0 +1,1 @@
+ALTER TABLE product_prices ADD CONSTRAINT fk_store FOREIGN KEY (`store_id`) REFERENCES `stores`(`id`);
