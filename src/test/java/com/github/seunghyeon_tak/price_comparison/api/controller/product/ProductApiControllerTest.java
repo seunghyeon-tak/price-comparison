@@ -1,7 +1,11 @@
 package com.github.seunghyeon_tak.price_comparison.api.controller.product;
 
 import com.github.seunghyeon_tak.price_comparison.api.business.product.ProductApiBusiness;
+import com.github.seunghyeon_tak.price_comparison.common.dto.api.response.product.ProductDetailDto;
+import com.github.seunghyeon_tak.price_comparison.common.dto.api.response.product.ProductPriceDto;
 import com.github.seunghyeon_tak.price_comparison.common.dto.api.response.product.ProductsDto;
+import com.github.seunghyeon_tak.price_comparison.common.exception.ApiException;
+import com.github.seunghyeon_tak.price_comparison.common.exception.response.enums.product.ProductResponseCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -96,5 +100,79 @@ class ProductApiControllerTest {
                         .param("size", "10")
                         .param("sort", "createdAt,DESC"))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("상품상세조회_정상응답")
+    void test5() throws Exception {
+        // given
+        Long productId = 1L;
+
+        ProductDetailDto productDetailDto = ProductDetailDto.builder()
+                .id(productId)
+                .name("테스트 상품")
+                .category("가전")
+                .lowestPrice(9900)
+                .description("상세 설명")
+                .images(List.of("http://image.com/1.jpg"))
+                .stores(List.of(
+                        ProductPriceDto.builder()
+                                .storeName("g마켓")
+                                .price(9900)
+                                .productUrl("https://gmarket.com")
+                                .lastUpdated(LocalDateTime.of(2025, 4, 13, 10, 0))
+                                .build()
+                ))
+                .createdAt(LocalDateTime.of(2025, 4, 13, 9, 0))
+                .build();
+
+        when(productApiBusiness.detail(productId)).thenReturn(productDetailDto);
+
+        // when & then
+        mockMvc.perform(get("/api/v1/products/{productId}", productId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.id").value(productId))
+                .andExpect(jsonPath("$.data.name").value("테스트 상품"))
+                .andExpect(jsonPath("$.data.lowestPrice").value(9900))
+                .andExpect(jsonPath("$.data.images").isArray())
+                .andExpect(jsonPath("$.data.stores[0].storeName").value("g마켓"))
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("존재하지않는_상품ID_요청시")
+    void test6() throws Exception {
+        // given
+        Long invalidId = 999L;
+        when(productApiBusiness.detail(invalidId)).thenThrow(new ApiException(ProductResponseCode.PRODUCT_NOT_FOUND));
+
+        // when & then
+        mockMvc.perform(get("/api/v1/products/{productId}", invalidId))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.result.resultCode").value(3000))
+                .andExpect(jsonPath("$.result.resultDescription").value(ProductResponseCode.PRODUCT_NOT_FOUND.getDescription()))
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("상품ID가_음수일_경우")
+    void test7() throws Exception {
+        // given
+        Long invalidId = -1L;
+        when(productApiBusiness.detail(invalidId)).thenThrow(new ApiException(ProductResponseCode.INVALID_PRODUCT_ID));
+
+        // when & then
+        mockMvc.perform(get("/api/v1/products/{productId}", invalidId))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.result.resultCode").value(3004))
+                .andExpect(jsonPath("$.result.resultDescription").value(ProductResponseCode.INVALID_PRODUCT_ID.getDescription()));
+    }
+
+    @Test
+    @DisplayName("상품ID가_숫자가_아닌경우")
+    void test8() throws Exception {
+        // when & then
+        mockMvc.perform(get("/api/v1/products/abcd"))
+                .andExpect(status().isInternalServerError());
     }
 }
