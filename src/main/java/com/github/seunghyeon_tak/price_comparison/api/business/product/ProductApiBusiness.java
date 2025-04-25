@@ -15,7 +15,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 @Business
 @RequiredArgsConstructor
@@ -29,7 +31,16 @@ public class ProductApiBusiness {
     @LogException
     public Page<ProductsDto> list(Pageable pageable) {
         Page<ProductEntity> entities = productApiService.getActiveProducts(pageable);
-        return productApiConverter.toResponsePage(entities);
+
+        // 상품 ID 리스트 추출
+        List<Long> productIds = entities.stream()
+                .map(ProductEntity::getId)
+                .toList();
+
+        // 상품별 최신 가격 가져오기
+        Map<Long, BigDecimal> priceMap = productPriceApiService.findLatestPriceByProductIds(productIds);
+
+        return productApiConverter.toResponsePage(entities, priceMap);
     }
 
     @BusinessLoggable("상품 상세 비지니스")
