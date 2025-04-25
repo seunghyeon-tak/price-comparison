@@ -7,22 +7,27 @@ import com.github.seunghyeon_tak.price_comparison.common.dto.api.response.produc
 import com.github.seunghyeon_tak.price_comparison.db.domain.ProductEntity;
 import org.springframework.data.domain.Page;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 @Converter
 public class ProductApiConverter {
-    public ProductsDto toResponse(ProductEntity productEntity) {
+    public ProductsDto toResponse(ProductEntity productEntity, BigDecimal price) {
         return ProductsDto.builder()
                 .id(productEntity.getId())
                 .name(productEntity.getName())
                 .purchaseUrl(productEntity.getPurchaseUrl())
                 .description(productEntity.getDescription())
+                .price(price)
                 .createdAt(productEntity.getCreatedAt())
                 .build();
     }
 
-    public Page<ProductsDto> toResponsePage(Page<ProductEntity> page) {
-        return page.map(this::toResponse);
+    public Page<ProductsDto> toResponsePage(Page<ProductEntity> page, Map<Long, BigDecimal> priceMap) {
+        return page.map(productEntity ->
+                toResponse(productEntity, priceMap.get(productEntity.getId()))
+        );
     }
 
     public ProductDetailDto toDetailResponse(
