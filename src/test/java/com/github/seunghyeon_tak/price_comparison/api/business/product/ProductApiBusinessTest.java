@@ -18,8 +18,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -73,8 +76,12 @@ class ProductApiBusinessTest {
         PageImpl<ProductEntity> entityPage = new PageImpl<>(List.of(productEntity()));
         PageImpl<ProductsDto> dtoPage = new PageImpl<>(List.of(productsDto()));
 
+        Map<Long, BigDecimal> priceMap = new HashMap<>();
+        priceMap.put(1L, new BigDecimal("10000"));
+
         when(productApiService.getActiveProducts(pageable)).thenReturn(entityPage);
-        when(productApiConverter.toResponsePage(entityPage)).thenReturn(dtoPage);
+        when(productPriceApiService.findLatestPriceByProductIds(List.of(1L))).thenReturn(priceMap);
+        when(productApiConverter.toResponsePage(entityPage, priceMap)).thenReturn(dtoPage);
 
         // when
         Page<ProductsDto> result = productApiBusiness.list(pageable);
@@ -92,8 +99,11 @@ class ProductApiBusinessTest {
         Page<ProductEntity> emptyEntityPage = new PageImpl<>(List.of());
         Page<ProductsDto> emptyDtoPage = new PageImpl<>(List.of());
 
+        Map<Long, BigDecimal> emptyPriceMap = new HashMap<>();
+
         when(productApiService.getActiveProducts(pageable)).thenReturn(emptyEntityPage);
-        when(productApiConverter.toResponsePage(emptyEntityPage)).thenReturn(emptyDtoPage);
+        when(productPriceApiService.findLatestPriceByProductIds(List.of())).thenReturn(emptyPriceMap);
+        when(productApiConverter.toResponsePage(emptyEntityPage, emptyPriceMap)).thenReturn(emptyDtoPage);
 
         // when
         Page<ProductsDto> result = productApiBusiness.list(pageable);
