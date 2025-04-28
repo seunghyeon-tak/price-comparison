@@ -39,6 +39,9 @@ public class ProductEntity {
     @Column(length = 1000)
     private String description;
 
+    @Column(columnDefinition = "JSON")
+    private String keyFeatures;
+
     @Column(nullable = false)
     private Boolean isActive;
 
