@@ -1,23 +1,14 @@
 package com.github.seunghyeon_tak.price_comparison.api.controller.user;
 
 import com.github.seunghyeon_tak.price_comparison.api.business.user.UserApiBusiness;
-import com.github.seunghyeon_tak.price_comparison.api.service.user.dto.LoginInfo;
 import com.github.seunghyeon_tak.price_comparison.common.annotation.ControllerLoggable;
-import com.github.seunghyeon_tak.price_comparison.common.dto.api.request.user.UserLoginRequest;
+import com.github.seunghyeon_tak.price_comparison.common.dto.api.request.user.UserPreferredStoresRequest;
 import com.github.seunghyeon_tak.price_comparison.common.dto.api.request.user.UserSignupRequest;
-import com.github.seunghyeon_tak.price_comparison.common.dto.api.response.user.UserInfoDto;
-import com.github.seunghyeon_tak.price_comparison.common.dto.api.response.user.UserLoginResponse;
 import com.github.seunghyeon_tak.price_comparison.common.exception.response.Api;
-import com.github.seunghyeon_tak.price_comparison.common.util.CookieUtils;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-
-import java.time.Duration;
 
 @RestController
 @RequiredArgsConstructor
@@ -40,4 +31,12 @@ public class UserApiController {
         return Api.success();
 
     }
+
+    @PostMapping("/{userId}/preferred-stores")
+    @ControllerLoggable("쇼핑몰 선택 컨트롤러")
+    public Api<Void> preferredStores(@PathVariable Long userId, @RequestBody UserPreferredStoresRequest request) {
+        userApiBusiness.preferredStores(userId, request.getStoreIds());
+        return Api.success();
+    }
+
 }
