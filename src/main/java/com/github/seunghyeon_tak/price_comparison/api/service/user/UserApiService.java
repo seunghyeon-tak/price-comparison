@@ -12,7 +12,9 @@ import com.github.seunghyeon_tak.price_comparison.db.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -71,6 +73,15 @@ public class UserApiService {
         userEntity.setAlertType(AlertType.NONE);
         userEntity.setIsActive(true);
         userRepository.save(userEntity);
+    }
+
+    public UserEntity getUserReference(Long userId) {
+        return userRepository.getReferenceById(userId);
+    }
+
+    @Transactional
+    public void updatePreferredStores(Long userId, List<Long> storeIds) {
+
     }
 
 }
