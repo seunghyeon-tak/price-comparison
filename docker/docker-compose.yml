@@ -30,6 +30,7 @@ services:
       - app_network
 
   spring-app:
+    profiles: ["disable"]
     build:
       context: ..
       dockerfile: Dockerfile

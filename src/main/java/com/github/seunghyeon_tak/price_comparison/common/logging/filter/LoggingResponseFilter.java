@@ -39,11 +39,13 @@ public class LoggingResponseFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, responseWrapper);
 
             byte[] content = responseWrapper.getContentAsByteArray();
-            if (content.length > 0) {
-                String responseBody = new String(content, responseWrapper.getCharacterEncoding() != null ? responseWrapper.getCharacterEncoding() : StandardCharsets.UTF_8.name());
-                String prettyResponseBody = formatJson(responseBody);
-                log.info("REQ_ID : {} | USER_ID : {} | 응답 바디 : {}", requestId, userId, prettyResponseBody);
+            String encoding = responseWrapper.getCharacterEncoding();
+            if (encoding == null || encoding.equalsIgnoreCase("ISO-8859-1")) {
+                encoding = StandardCharsets.UTF_8.name();
             }
+            String responseBody = new String(content, encoding);
+            String prettyResponseBody = formatJson(responseBody);
+            log.info("REQ_ID : {} | USER_ID : {} | 응답 바디 : {}", requestId, userId, prettyResponseBody);
 
             responseWrapper.copyBodyToResponse();
         } finally {
