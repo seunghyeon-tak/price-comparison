@@ -5,18 +5,23 @@ import com.github.seunghyeon_tak.price_comparison.common.exception.response.enum
 import com.github.seunghyeon_tak.price_comparison.db.domain.StoreEntity;
 import com.github.seunghyeon_tak.price_comparison.db.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class StoreApiService {
     private final StoreRepository storeRepository;
 
     public void validateStoresExist(List<Long> storeIds) {
-        List<StoreEntity> existingStoreIds = storeRepository.findByIdIn(storeIds);
+        List<StoreEntity> existingStores = storeRepository.findByIdIn(storeIds);
+        List<Long> existingStoreIds = existingStores.stream()
+                .map(StoreEntity::getId)
+                .toList();
 
         List<Long> invalidStoreIds = storeIds.stream()
                 .filter(id -> !existingStoreIds.contains(id))
