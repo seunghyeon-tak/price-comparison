@@ -4,10 +4,12 @@ import com.github.seunghyeon_tak.price_comparison.api.business.user.UserApiBusin
 import com.github.seunghyeon_tak.price_comparison.common.annotation.ControllerLoggable;
 import com.github.seunghyeon_tak.price_comparison.common.dto.api.request.user.UserPreferredStoresRequest;
 import com.github.seunghyeon_tak.price_comparison.common.dto.api.request.user.UserSignupRequest;
+import com.github.seunghyeon_tak.price_comparison.common.dto.api.request.user.UserWishlistRequest;
 import com.github.seunghyeon_tak.price_comparison.common.exception.response.Api;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -15,6 +17,10 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/user")
 public class UserApiController {
     private final UserApiBusiness userApiBusiness;
+
+    private Long getCurrentUserId() {
+        return Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString());
+    }
 
     @PostMapping("/public/signup")
     @ControllerLoggable("회원가입 컨트롤러")
@@ -36,6 +42,14 @@ public class UserApiController {
     @ControllerLoggable("쇼핑몰 선택 컨트롤러")
     public Api<Void> preferredStores(@PathVariable Long userId, @RequestBody UserPreferredStoresRequest request) {
         userApiBusiness.preferredStores(userId, request.getStoreIds());
+        return Api.success();
+    }
+
+    @PostMapping("/wishlist")
+    @ControllerLoggable("상품 찜 추가 컨트롤러")
+    public Api<Void> addToWishlist(@RequestBody UserWishlistRequest request) {
+        Long userId = getCurrentUserId();
+        userApiBusiness.addWishlist(userId, request.getProductId());
         return Api.success();
     }
 
