@@ -1,13 +1,23 @@
 package com.github.seunghyeon_tak.price_comparison.api.business.user;
 
 import com.github.seunghyeon_tak.price_comparison.api.converter.user.UserApiConverter;
+import com.github.seunghyeon_tak.price_comparison.api.converter.user.UserFavoritesConverter;
+import com.github.seunghyeon_tak.price_comparison.api.service.product.ProductApiService;
 import com.github.seunghyeon_tak.price_comparison.api.service.store.StoreApiService;
 import com.github.seunghyeon_tak.price_comparison.api.service.user.UserApiService;
+import com.github.seunghyeon_tak.price_comparison.api.service.user.UserFavoritesService;
 import com.github.seunghyeon_tak.price_comparison.api.service.user.UserPreferredStoreService;
 import com.github.seunghyeon_tak.price_comparison.common.dto.api.request.user.UserSignupRequest;
+import com.github.seunghyeon_tak.price_comparison.common.dto.api.request.user.UserWishlistRequest;
 import com.github.seunghyeon_tak.price_comparison.common.exception.ApiException;
+import com.github.seunghyeon_tak.price_comparison.common.exception.response.enums.user.UserFavoritesResponseCode;
 import com.github.seunghyeon_tak.price_comparison.common.exception.response.enums.user.UserResponseCode;
+import com.github.seunghyeon_tak.price_comparison.db.domain.ProductEntity;
 import com.github.seunghyeon_tak.price_comparison.db.domain.UserEntity;
+import com.github.seunghyeon_tak.price_comparison.db.domain.UserFavoritesEntity;
+import com.github.seunghyeon_tak.price_comparison.fixture.ProductFixture;
+import com.github.seunghyeon_tak.price_comparison.fixture.UserFavoritesFixture;
+import com.github.seunghyeon_tak.price_comparison.fixture.UserFixture;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,6 +40,9 @@ class UserApiBusinessTest {
     private UserApiConverter userApiConverter;
 
     @Mock
+    private UserFavoritesConverter userFavoritesConverter;
+
+    @Mock
     private UserApiService userApiService;
 
     @Mock
@@ -37,6 +50,12 @@ class UserApiBusinessTest {
 
     @Mock
     private UserPreferredStoreService userPreferredStoreService;
+
+    @Mock
+    private ProductApiService productApiService;
+
+    @Mock
+    private UserFavoritesService userFavoritesService;
 
     @Test
     @DisplayName("회원가입_성공")
@@ -135,6 +154,60 @@ class UserApiBusinessTest {
         verify(userApiService).getUserId(userId);
         verify(storeApiService, never()).validateStoresExist(any());
         verify(userPreferredStoreService, never()).updatePreferredStores(any(), any());
+    }
+
+    @Test
+    @DisplayName("사용자_상품_찜_추가_성공")
+    void test5() {
+        // given
+        Long userId = 1L;
+        UserWishlistRequest request = UserWishlistRequest.builder()
+                .productId(1L)
+                .build();
+        UserEntity user = UserFixture.create(1L, "test@test.com");
+        ProductEntity product = ProductFixture.create(1L, "테스트 상품");
+        UserFavoritesEntity userFavorites = UserFavoritesFixture.create(user, product);
+
+        when(userApiService.getUserId(userId)).thenReturn(user);
+        when(productApiService.getProduct(request.getProductId())).thenReturn(product);
+        when(userFavoritesConverter.toEntity(user, product)).thenReturn(userFavorites);
+        doNothing().when(userFavoritesService).save(userFavorites);
+
+        // when
+        userApiBusiness.addWishlist(userId, request.getProductId());
+
+        // then
+        verify(userApiService).getUserId(userId);
+        verify(productApiService).getProduct(request.getProductId());
+        verify(userFavoritesConverter).toEntity(user, product);
+        verify(userFavoritesService).save(userFavorites);
+    }
+
+    @Test
+    @DisplayName("사용자_상품_찜_존재하지않을때")
+    void test6() {
+        // given
+        Long userId = 1L;
+        UserWishlistRequest request = UserWishlistRequest.builder()
+                .productId(999L)
+                .build();
+
+        // 이미 찜된 상품이 존재한다고 가정
+        when(userFavoritesService.existsByUserAndProduct(userId, request.getProductId()))
+                .thenReturn(true);
+
+        // when & then
+        ApiException apiException = assertThrows(ApiException.class, () -> {
+            userApiBusiness.addWishlist(userId, request.getProductId());
+        });
+
+        assertThat(apiException.getErrorDescription())
+                .isEqualTo(UserFavoritesResponseCode.EXISTENCE_IN_PRODUCT.getDescription());
+
+        verify(userApiService, never()).getUserId(userId);
+        verify(productApiService, never()).getProduct(request.getProductId());
+        verify(userFavoritesConverter, never()).toEntity(any(), any());
+        verify(userFavoritesService, never()).save(any());
     }
 
 }
