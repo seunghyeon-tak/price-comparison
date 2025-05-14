@@ -210,4 +210,57 @@ class UserApiBusinessTest {
         verify(userFavoritesService, never()).save(any());
     }
 
+    @Test
+    @DisplayName("사용자_찜_제거_성공")
+    void test7() {
+        // given
+        Long userId = 1L;
+        Long productId = 2L;
+
+        UserEntity user = UserFixture.create(userId, "test@test.com");
+        ProductEntity product = ProductFixture.create(productId, "테스트 상품");
+
+        when(userApiService.getUserId(userId)).thenReturn(user);
+        when(productApiService.getProduct(productId)).thenReturn(product);
+        doNothing().when(userFavoritesService).delete(userId, productId);
+
+        // when
+        userApiBusiness.removeWishlist(userId, productId);
+
+        // then
+        verify(userApiService).getUserId(userId);
+        verify(productApiService).getProduct(productId);
+        verify(userFavoritesService).delete(userId, productId);
+    }
+
+    @Test
+    @DisplayName("사용자_찜_제거_실패")
+    void test8() {
+        // given
+        Long userId = 1L;
+        Long productId = 999L;
+
+        UserEntity user = UserFixture.create(userId, "test@test.com");
+        ProductEntity product = ProductFixture.create(productId, "없는 상품");
+
+        when(userApiService.getUserId(userId)).thenReturn(user);
+        when(productApiService.getProduct(productId)).thenReturn(product);
+
+        // 예외 발생
+        doThrow(new ApiException(UserFavoritesResponseCode.NOT_FOUND_IN_USER_FAVORITES))
+                .when(userFavoritesService).delete(userId, productId);
+
+        // when & then
+        ApiException apiException = assertThrows(ApiException.class, () -> {
+            userApiBusiness.removeWishlist(userId, productId);
+        });
+
+        assertThat(apiException.getErrorDescription())
+                .isEqualTo(UserFavoritesResponseCode.NOT_FOUND_IN_USER_FAVORITES.getDescription());
+
+        verify(userApiService).getUserId(userId);
+        verify(productApiService).getProduct(productId);
+        verify(userFavoritesService).delete(userId, productId);
+    }
+
 }
