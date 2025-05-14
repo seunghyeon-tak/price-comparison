@@ -62,4 +62,12 @@ public class UserApiBusiness {
         UserFavoritesEntity entity = userFavoritesConverter.toEntity(user, product);
         userFavoritesService.save(entity);
     }
+
+    @BusinessLoggable("사용자 찜 목록 삭제 비지니스")
+    @LogException
+    public void removeWishlist(Long userId, Long productId) {
+        userApiService.getUserId(userId);
+        productApiService.getProduct(productId);
+        userFavoritesService.delete(userId, productId);
+    }
 }

@@ -53,4 +53,12 @@ public class UserApiController {
         return Api.success();
     }
 
+    @DeleteMapping("/wishlist/{productId}")
+    @ControllerLoggable("상품 찜 삭제 컨트롤러")
+    public Api<Void> removeFromWishlist(@PathVariable Long productId) {
+        Long userId = getCurrentUserId();
+        userApiBusiness.removeWishlist(userId, productId);
+        return Api.success();
+    }
+
 }

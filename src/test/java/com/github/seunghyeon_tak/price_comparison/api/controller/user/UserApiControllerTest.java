@@ -26,6 +26,7 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -204,5 +205,38 @@ class UserApiControllerTest {
                 .andExpect(jsonPath("$.result.resultCode").value(3000))
                 .andExpect(jsonPath("$.result.resultMessage").value("찾는 상품이 없습니다."))
                 .andExpect(jsonPath("$.result.resultDescription").value("찾는 상품이 없습니다."));
+    }
+
+    @Test
+    @DisplayName("사용자_상품_찜_삭제_성공")
+    void test8() throws Exception {
+        // given
+        userSecurityContext(1L);
+
+        // when & then
+        mockMvc.perform(delete("/api/v1/user/wishlist/{productId}", 1L)
+                        .contentType("application/json"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.result.resultCode").value("200"))
+                .andExpect(jsonPath("$.result.resultMessage").value("success"))
+                .andExpect(jsonPath("$.result.resultDescription").value("success"));
+    }
+
+    @Test
+    @DisplayName("사용자_상품_찜_존재하지_않는_상품일때")
+    void test9() throws Exception {
+        // given
+        userSecurityContext(1L);
+        Long productId = 999L;
+
+        doThrow(new ApiException(UserFavoritesResponseCode.NOT_FOUND_IN_USER_FAVORITES))
+                .when(userApiBusiness).removeWishlist(1L, productId);
+
+        // when & then
+        mockMvc.perform(delete("/api/v1/user/wishlist/{productId}", productId)
+                        .contentType("application/json"))
+                .andExpect(jsonPath("$.result.resultCode").value(5001))
+                .andExpect(jsonPath("$.result.resultMessage").value("사용자 찜 목록에서 찾을 수 없습니다."))
+                .andExpect(jsonPath("$.result.resultDescription").value("사용자 찜 목록에서 찾을 수 없습니다."));
     }
 }
