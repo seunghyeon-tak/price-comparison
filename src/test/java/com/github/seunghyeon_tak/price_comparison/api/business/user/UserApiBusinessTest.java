@@ -9,6 +9,7 @@ import com.github.seunghyeon_tak.price_comparison.api.service.user.UserFavorites
 import com.github.seunghyeon_tak.price_comparison.api.service.user.UserPreferredStoreService;
 import com.github.seunghyeon_tak.price_comparison.common.dto.api.request.user.UserSignupRequest;
 import com.github.seunghyeon_tak.price_comparison.common.dto.api.request.user.UserWishlistRequest;
+import com.github.seunghyeon_tak.price_comparison.common.dto.api.response.user.UserFavoritesProductDto;
 import com.github.seunghyeon_tak.price_comparison.common.exception.ApiException;
 import com.github.seunghyeon_tak.price_comparison.common.exception.response.enums.user.UserFavoritesResponseCode;
 import com.github.seunghyeon_tak.price_comparison.common.exception.response.enums.user.UserResponseCode;
@@ -24,6 +25,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 import java.util.List;
 
@@ -261,6 +266,44 @@ class UserApiBusinessTest {
         verify(userApiService).getUserId(userId);
         verify(productApiService).getProduct(productId);
         verify(userFavoritesService).delete(userId, productId);
+    }
+
+    @Test
+    @DisplayName("사용자_찜_리스트_반환_성공")
+    void test9() {
+        // given
+        Long userId = 1L;
+        PageRequest pageable = PageRequest.of(0, 10, Sort.by("createdAt").descending());
+        UserFavoritesProductDto dto = UserFavoritesFixture.createFavoritesDtp();
+        Page<UserFavoritesProductDto> mockPage = new PageImpl<>(List.of(dto));
+
+        when(userFavoritesService.getFavoritesProducts(userId, pageable)).thenReturn(mockPage);
+
+        // when
+        Page<UserFavoritesProductDto> result = userApiBusiness.getWishlist(pageable, userId);
+
+        // then
+        assertThat(result.getContent()).hasSize(1);
+        assertThat(result.getContent().get(0).getName()).isEqualTo("테스트 상품");
+
+        verify(userFavoritesService).getFavoritesProducts(userId, pageable);
+    }
+
+    @Test
+    @DisplayName("사용자_찜_리스트_비어있을때")
+    void test10() {
+        // given
+        Long userId = 1L;
+        PageRequest pageable = PageRequest.of(0, 10, Sort.by("createdAt").descending());
+        Page<UserFavoritesProductDto> mockPage = new PageImpl<>(List.of());
+
+        when(userFavoritesService.getFavoritesProducts(userId, pageable)).thenReturn(mockPage);
+
+        // when
+        Page<UserFavoritesProductDto> result = userApiBusiness.getWishlist(pageable, userId);
+
+        // then
+        assertThat(result.isEmpty()).isTrue();
     }
 
 }
