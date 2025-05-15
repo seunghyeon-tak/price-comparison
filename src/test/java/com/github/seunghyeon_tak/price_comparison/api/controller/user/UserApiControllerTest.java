@@ -5,6 +5,7 @@ import com.github.seunghyeon_tak.price_comparison.api.business.user.UserApiBusin
 import com.github.seunghyeon_tak.price_comparison.common.dto.api.request.user.UserPreferredStoresRequest;
 import com.github.seunghyeon_tak.price_comparison.common.dto.api.request.user.UserSignupRequest;
 import com.github.seunghyeon_tak.price_comparison.common.dto.api.request.user.UserWishlistRequest;
+import com.github.seunghyeon_tak.price_comparison.common.dto.api.response.user.UserFavoritesProductDto;
 import com.github.seunghyeon_tak.price_comparison.common.exception.ApiException;
 import com.github.seunghyeon_tak.price_comparison.common.exception.response.enums.product.ProductResponseCode;
 import com.github.seunghyeon_tak.price_comparison.common.exception.response.enums.store.StoreResponseCode;
@@ -16,18 +17,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -48,6 +53,17 @@ class UserApiControllerTest {
         Authentication authentication = new UsernamePasswordAuthenticationToken(String.valueOf(userId), null);
         context.setAuthentication(authentication);
         SecurityContextHolder.setContext(context);
+    }
+
+    private UserFavoritesProductDto sampleFavoritesProduct() {
+        return UserFavoritesProductDto.builder()
+                .id(1L)
+                .imageUrl("https://example.com")
+                .storeName("테스트 쇼핑몰")
+                .name("테스트 상품")
+                .price(BigDecimal.valueOf(3000))
+                .favoritedAt(LocalDateTime.now())
+                .build();
     }
 
     @Test
@@ -238,5 +254,44 @@ class UserApiControllerTest {
                 .andExpect(jsonPath("$.result.resultCode").value(5001))
                 .andExpect(jsonPath("$.result.resultMessage").value("사용자 찜 목록에서 찾을 수 없습니다."))
                 .andExpect(jsonPath("$.result.resultDescription").value("사용자 찜 목록에서 찾을 수 없습니다."));
+    }
+
+    @Test
+    @DisplayName("사용자_상품_찜_리스트_조회")
+    void test10() throws Exception {
+        // given
+        Long userId = 1L;
+        userSecurityContext(userId);
+        Page<UserFavoritesProductDto> mockPage = new PageImpl<>(List.of(sampleFavoritesProduct()));
+        when(userApiBusiness.getWishlist(any(), any())).thenReturn(mockPage);
+
+        // when & then
+        mockMvc.perform(get("/api/v1/user/wishlist")
+                        .param("page", "0")
+                        .param("size", "10")
+                        .param("sort", "createdAt,DESC"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.result.resultCode").value(200))
+                .andExpect(jsonPath("$.result.resultMessage").value("success"))
+                .andExpect(jsonPath("$.data.content[0].name").value("테스트 상품"))
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("사용자_상품_찜_리스트_조회 - 데이터 없음")
+    void test11() throws Exception {
+        // given
+        userSecurityContext(1L);
+        Page<UserFavoritesProductDto> emptyPage = new PageImpl<>(List.of());
+        when(userApiBusiness.getWishlist(any(), any())).thenReturn(emptyPage);
+
+        // when & then
+        mockMvc.perform(get("/api/v1/user/wishlist")
+                        .param("page", "0")
+                        .param("size", "10")
+                        .param("sort", "createdAt,DESC"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.content").isArray())
+                .andExpect(jsonPath("$.data.content").isEmpty());
     }
 }
