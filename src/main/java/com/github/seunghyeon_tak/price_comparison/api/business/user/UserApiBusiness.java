@@ -11,12 +11,15 @@ import com.github.seunghyeon_tak.price_comparison.common.annotation.Business;
 import com.github.seunghyeon_tak.price_comparison.common.annotation.BusinessLoggable;
 import com.github.seunghyeon_tak.price_comparison.common.annotation.LogException;
 import com.github.seunghyeon_tak.price_comparison.common.dto.api.request.user.UserSignupRequest;
+import com.github.seunghyeon_tak.price_comparison.common.dto.api.response.user.UserFavoritesProductDto;
 import com.github.seunghyeon_tak.price_comparison.common.exception.ApiException;
 import com.github.seunghyeon_tak.price_comparison.common.exception.response.enums.user.UserFavoritesResponseCode;
 import com.github.seunghyeon_tak.price_comparison.db.domain.ProductEntity;
 import com.github.seunghyeon_tak.price_comparison.db.domain.UserEntity;
 import com.github.seunghyeon_tak.price_comparison.db.domain.UserFavoritesEntity;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -69,5 +72,11 @@ public class UserApiBusiness {
         userApiService.getUserId(userId);
         productApiService.getProduct(productId);
         userFavoritesService.delete(userId, productId);
+    }
+
+    @BusinessLoggable("사용자 찜 리스트 비지니스")
+    @LogException
+    public Page<UserFavoritesProductDto> getWishlist(Pageable pageable, Long userId) {
+        return userFavoritesService.getFavoritesProducts(userId, pageable);
     }
 }

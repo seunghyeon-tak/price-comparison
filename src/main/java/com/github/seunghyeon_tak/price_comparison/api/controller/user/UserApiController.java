@@ -5,9 +5,14 @@ import com.github.seunghyeon_tak.price_comparison.common.annotation.ControllerLo
 import com.github.seunghyeon_tak.price_comparison.common.dto.api.request.user.UserPreferredStoresRequest;
 import com.github.seunghyeon_tak.price_comparison.common.dto.api.request.user.UserSignupRequest;
 import com.github.seunghyeon_tak.price_comparison.common.dto.api.request.user.UserWishlistRequest;
+import com.github.seunghyeon_tak.price_comparison.common.dto.api.response.user.UserFavoritesProductDto;
 import com.github.seunghyeon_tak.price_comparison.common.exception.response.Api;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -61,4 +66,21 @@ public class UserApiController {
         return Api.success();
     }
 
+    @GetMapping("/wishlist")
+    @ControllerLoggable("상품 찜 리스트 컨트롤러")
+    public Api<Page<UserFavoritesProductDto>> getUserWishlist(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "createdAt,DESC") String sort
+    ) {
+        String[] sortParams = sort.split(",");
+        PageRequest pageable = PageRequest.of(
+                page,
+                size,
+                Sort.by(Sort.Direction.fromString(sortParams[1]), sortParams[0])
+        );
+        Long userId = getCurrentUserId();
+        Page<UserFavoritesProductDto> response = userApiBusiness.getWishlist(pageable, userId);
+        return Api.success(response);
+    }
 }
