@@ -20,6 +20,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.math.BigDecimal;
 
 import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -95,6 +96,49 @@ class PriceAlertsApiControllerTest {
                 .andDo(print());
 
         verify(priceAlertsApiBusiness).registerPriceAlert(userId, request);
+    }
+
+    @Test
+    @DisplayName("가격 알림 제거 성공")
+    void test3() throws Exception {
+        // given
+        Long userId = 1L;
+        Long productId = 2L;
+        userSecurityContext(userId);
+
+        doNothing().when(priceAlertsApiBusiness).deactivatePriceAlert(userId, productId);
+
+        // when & then
+        mockMvc.perform(patch("/api/v1/price-alerts/{productId}", productId)
+                        .contentType("application/json"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.result.resultCode").value(200))
+                .andExpect(jsonPath("$.result.resultMessage").value("success"))
+                .andExpect(jsonPath("$.result.resultDescription").value("success"))
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("가격 알림 제거 데이터 없거나 잘못되었을때")
+    void test4() throws Exception {
+        // given
+        Long userId = 1L;
+        Long productId = 999L;
+        userSecurityContext(userId);
+
+        doThrow(new ApiException(PriceAlertResponseCode.ALTER_NOT_FOUND))
+                .when(priceAlertsApiBusiness).deactivatePriceAlert(userId, productId);
+
+        // when & then
+        mockMvc.perform(patch("/api/v1/price-alerts/{productId}", productId)
+                        .contentType("application/json"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.result.resultCode").value(6001))
+                .andExpect(jsonPath("$.result.resultMessage").value("제거하려는 알림 데이터가 없습니다."))
+                .andExpect(jsonPath("$.result.resultDescription").value("제거하려는 알림 데이터가 없습니다."))
+                .andDo(print());
+
+        verify(priceAlertsApiBusiness).deactivatePriceAlert(userId, productId);
     }
 
 }
