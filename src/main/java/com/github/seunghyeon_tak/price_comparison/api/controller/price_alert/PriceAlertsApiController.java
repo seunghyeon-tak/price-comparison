@@ -6,10 +6,7 @@ import com.github.seunghyeon_tak.price_comparison.common.dto.api.request.price_a
 import com.github.seunghyeon_tak.price_comparison.common.exception.response.Api;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/price-alerts")
@@ -26,6 +23,14 @@ public class PriceAlertsApiController {
     public Api<Void> registerPriceAlert(@RequestBody PriceAlertsRequest request) {
         Long userId = getCurrentUserId();
         priceAlertsApiBusiness.registerPriceAlert(userId, request);
+        return Api.success();
+    }
+
+    @PatchMapping("/{productId}")
+    @ControllerLoggable("가격 알림 설정 제거 컨트롤러")
+    public Api<Void> deactivatePriceAlert(@PathVariable Long productId) {
+        Long userId = getCurrentUserId();
+        priceAlertsApiBusiness.deactivatePriceAlert(userId, productId);
         return Api.success();
     }
 }

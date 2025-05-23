@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +25,15 @@ public class PriceAlertsApiService {
     }
 
     public void createAlert(PriceAlertsEntity priceAlerts) {
+        priceAlertsRepository.save(priceAlerts);
+    }
+
+    public Optional<PriceAlertsEntity> alertProductCheck(UserEntity user, ProductEntity product) {
+        return priceAlertsRepository.findByUserAndProductAndIsActive(user, product, true);
+    }
+
+    public void deactivateAlertUpdate(PriceAlertsEntity priceAlerts) {
+        priceAlerts.setIsActive(false);
         priceAlertsRepository.save(priceAlerts);
     }
 }
