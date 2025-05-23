@@ -10,4 +10,6 @@ import java.util.Optional;
 
 public interface PriceAlertsRepository extends JpaRepository<PriceAlertsEntity, Long> {
     Optional<PriceAlertsEntity> findByUserAndProductAndTargetPriceAndIsActive(UserEntity user, ProductEntity product, BigDecimal targetPrice, boolean isActive);
+
+    Optional<PriceAlertsEntity> findByUserAndProductAndIsActive(UserEntity user, ProductEntity product, boolean isActive);
 }

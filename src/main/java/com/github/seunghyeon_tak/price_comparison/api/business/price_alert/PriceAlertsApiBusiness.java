@@ -8,10 +8,14 @@ import com.github.seunghyeon_tak.price_comparison.common.annotation.Business;
 import com.github.seunghyeon_tak.price_comparison.common.annotation.BusinessLoggable;
 import com.github.seunghyeon_tak.price_comparison.common.annotation.LogException;
 import com.github.seunghyeon_tak.price_comparison.common.dto.api.request.price_alert.PriceAlertsRequest;
+import com.github.seunghyeon_tak.price_comparison.common.exception.ApiException;
+import com.github.seunghyeon_tak.price_comparison.common.exception.response.enums.price_alert.PriceAlertResponseCode;
 import com.github.seunghyeon_tak.price_comparison.db.domain.PriceAlertsEntity;
 import com.github.seunghyeon_tak.price_comparison.db.domain.ProductEntity;
 import com.github.seunghyeon_tak.price_comparison.db.domain.UserEntity;
 import lombok.RequiredArgsConstructor;
+
+import java.util.Optional;
 
 @Business
 @RequiredArgsConstructor
@@ -38,5 +42,15 @@ public class PriceAlertsApiBusiness {
 
         // 알림 저장
         priceAlertsApiService.createAlert(priceAlertsEntity);
+    }
+
+    @BusinessLoggable("가격 알림 설정 제거 비지니스")
+    @LogException
+    public void deactivatePriceAlert(Long userId, Long productId) {
+        UserEntity user = userApiService.getUserId(userId);
+        ProductEntity product = productApiService.getProduct(productId);
+        PriceAlertsEntity priceAlertsEntity = priceAlertsApiService.alertProductCheck(user, product)
+                .orElseThrow(() -> new ApiException(PriceAlertResponseCode.ALTER_NOT_FOUND));
+        priceAlertsApiService.deactivateAlertUpdate(priceAlertsEntity);
     }
 }

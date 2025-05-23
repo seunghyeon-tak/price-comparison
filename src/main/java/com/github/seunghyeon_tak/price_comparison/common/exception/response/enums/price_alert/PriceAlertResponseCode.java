@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 @AllArgsConstructor
 public enum PriceAlertResponseCode implements ResponseCodeIfs {
     DUPLICATE_PRODUCT(HttpStatus.BAD_REQUEST.value(), 6000, "이미 같은 가격에 등록된 알림이 있습니다."),
+    ALTER_NOT_FOUND(HttpStatus.BAD_REQUEST.value(), 6001, "제거하려는 알림 데이터가 없습니다."),
     ;
 
     private final Integer httpStatusCode;

@@ -21,6 +21,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -105,4 +106,57 @@ class PriceAlertsApiBusinessTest {
         verify(priceAlertsApiService, never()).createAlert(any());
     }
 
+    @Test
+    @DisplayName("상품 가격 알림 비활성화 성공")
+    void test3() {
+        // given
+        Long userId = 1L;
+        Long productId = 2L;
+
+        UserEntity user = UserFixture.create(userId, "test@test.com");
+        ProductEntity product = ProductFixture.create(productId, "테스트 상품");
+        PriceAlertsEntity priceAlerts = PriceAlertsFixture.create(3L, BigDecimal.valueOf(10000));
+
+        when(userApiService.getUserId(userId)).thenReturn(user);
+        when(productApiService.getProduct(productId)).thenReturn(product);
+        when(priceAlertsApiService.alertProductCheck(user, product)).thenReturn(Optional.of(priceAlerts));
+        doNothing().when(priceAlertsApiService).deactivateAlertUpdate(priceAlerts);
+
+        // when
+        priceAlertsApiBusiness.deactivatePriceAlert(userId, productId);
+
+        // then
+        verify(userApiService).getUserId(userId);
+        verify(productApiService).getProduct(productId);
+        verify(priceAlertsApiService).alertProductCheck(user, product);
+        verify(priceAlertsApiService).deactivateAlertUpdate(priceAlerts);
+    }
+
+    @Test
+    @DisplayName("가격 알림을 isActive=false로 비활성화 처리 성공")
+    void test4() {
+        // given
+        Long userId = 1L;
+        Long productId = 2L;
+
+        UserEntity user = UserFixture.create(userId, "test@test.com");
+        ProductEntity product = ProductFixture.create(productId, "테스트 상품");
+        PriceAlertsEntity priceAlerts = PriceAlertsFixture.create(3L, BigDecimal.valueOf(10000));
+
+        when(userApiService.getUserId(userId)).thenReturn(user);
+        when(productApiService.getProduct(productId)).thenReturn(product);
+        doThrow(new ApiException(PriceAlertResponseCode.ALTER_NOT_FOUND))
+                .when(priceAlertsApiService).alertProductCheck(user, product);
+
+        // when & then
+        ApiException apiException = assertThrows(ApiException.class, () -> {
+            priceAlertsApiBusiness.deactivatePriceAlert(userId, productId);
+        });
+
+        assertThat(apiException.getErrorDescription())
+                .isEqualTo(PriceAlertResponseCode.ALTER_NOT_FOUND.getDescription());
+
+        verify(priceAlertsApiService).alertProductCheck(user, product);
+        verify(priceAlertsApiService, never()).deactivateAlertUpdate(any());
+    }
 }
