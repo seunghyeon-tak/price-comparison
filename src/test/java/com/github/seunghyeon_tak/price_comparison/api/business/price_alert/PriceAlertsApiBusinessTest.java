@@ -5,6 +5,7 @@ import com.github.seunghyeon_tak.price_comparison.api.service.price_alert.PriceA
 import com.github.seunghyeon_tak.price_comparison.api.service.product.ProductApiService;
 import com.github.seunghyeon_tak.price_comparison.api.service.user.UserApiService;
 import com.github.seunghyeon_tak.price_comparison.common.dto.api.request.price_alert.PriceAlertsRequest;
+import com.github.seunghyeon_tak.price_comparison.common.dto.api.response.price_alerts.PriceAlertsDto;
 import com.github.seunghyeon_tak.price_comparison.common.exception.ApiException;
 import com.github.seunghyeon_tak.price_comparison.common.exception.response.enums.price_alert.PriceAlertResponseCode;
 import com.github.seunghyeon_tak.price_comparison.db.domain.PriceAlertsEntity;
@@ -19,8 +20,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -158,5 +165,54 @@ class PriceAlertsApiBusinessTest {
 
         verify(priceAlertsApiService).alertProductCheck(user, product);
         verify(priceAlertsApiService, never()).deactivateAlertUpdate(any());
+    }
+
+    @Test
+    @DisplayName("가격 상품 리스트 반환")
+    void test5() {
+        // given
+        Long userId = 1L;
+        PageRequest pageable = PageRequest.of(0, 10, Sort.by("createdAt").descending());
+        PriceAlertsDto alertsDto = PriceAlertsDto.builder()
+                .id(1L)
+                .productId(100L)
+                .productName("테스트 상품")
+                .productImageUrl("http://example.com/image.jpg")
+                .latestPrice(new BigDecimal("10000"))
+                .targetPrice(new BigDecimal("9000"))
+                .isActive(true)
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        PageImpl<PriceAlertsDto> mockResult = new PageImpl<>(List.of(alertsDto));
+
+        // when
+        when(priceAlertsApiService.findPriceAlertsWithLatestPrice(pageable, userId)).thenReturn(mockResult);
+
+        // then
+        Page<PriceAlertsDto> result = priceAlertsApiBusiness.getPriceAlerts(pageable, userId);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getTotalElements()).isEqualTo(1);
+        assertThat(result.getContent().get(0).getProductName()).isEqualTo("테스트 상품");
+
+        verify(priceAlertsApiService).findPriceAlertsWithLatestPrice(pageable, userId);
+    }
+
+    @Test
+    @DisplayName("가격 알림 리스트가 비어있을때")
+    void test6() {
+        // given
+        Long userId = 1L;
+        PageRequest pageable = PageRequest.of(0, 10);
+
+        when(priceAlertsApiService.findPriceAlertsWithLatestPrice(pageable, userId)).thenReturn(Page.empty(pageable));
+
+        // when
+        Page<PriceAlertsDto> result = priceAlertsApiBusiness.getPriceAlerts(pageable, userId);
+
+        // then
+        assertThat(result).isEmpty();
+        verify(priceAlertsApiService).findPriceAlertsWithLatestPrice(pageable, userId);
     }
 }
