@@ -8,14 +8,16 @@ import com.github.seunghyeon_tak.price_comparison.common.annotation.Business;
 import com.github.seunghyeon_tak.price_comparison.common.annotation.BusinessLoggable;
 import com.github.seunghyeon_tak.price_comparison.common.annotation.LogException;
 import com.github.seunghyeon_tak.price_comparison.common.dto.api.request.price_alert.PriceAlertsRequest;
+import com.github.seunghyeon_tak.price_comparison.common.dto.api.response.price_alerts.PriceAlertsDto;
 import com.github.seunghyeon_tak.price_comparison.common.exception.ApiException;
 import com.github.seunghyeon_tak.price_comparison.common.exception.response.enums.price_alert.PriceAlertResponseCode;
 import com.github.seunghyeon_tak.price_comparison.db.domain.PriceAlertsEntity;
 import com.github.seunghyeon_tak.price_comparison.db.domain.ProductEntity;
 import com.github.seunghyeon_tak.price_comparison.db.domain.UserEntity;
+import com.github.seunghyeon_tak.price_comparison.db.repository.price_alerts.PriceAlertsRepository;
 import lombok.RequiredArgsConstructor;
-
-import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @Business
 @RequiredArgsConstructor
@@ -24,6 +26,7 @@ public class PriceAlertsApiBusiness {
     private final ProductApiService productApiService;
     private final UserApiService userApiService;
     private final PriceAlertsApiConverter priceAlertsApiConverter;
+    private final PriceAlertsRepository priceAlertsRepository;
 
     @BusinessLoggable("가격 알림 설정 등록 비지니스")
     @LogException
@@ -52,5 +55,11 @@ public class PriceAlertsApiBusiness {
         PriceAlertsEntity priceAlertsEntity = priceAlertsApiService.alertProductCheck(user, product)
                 .orElseThrow(() -> new ApiException(PriceAlertResponseCode.ALTER_NOT_FOUND));
         priceAlertsApiService.deactivateAlertUpdate(priceAlertsEntity);
+    }
+
+    @BusinessLoggable("가격 알림 설정 리스트 비지니스")
+    @LogException
+    public Page<PriceAlertsDto> getPriceAlerts(Pageable pageable, Long userId) {
+        return priceAlertsApiService.findPriceAlertsWithLatestPrice(pageable, userId);
     }
 }

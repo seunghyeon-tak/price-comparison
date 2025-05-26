@@ -3,6 +3,7 @@ package com.github.seunghyeon_tak.price_comparison.api.controller.price_alert;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.seunghyeon_tak.price_comparison.api.business.price_alert.PriceAlertsApiBusiness;
 import com.github.seunghyeon_tak.price_comparison.common.dto.api.request.price_alert.PriceAlertsRequest;
+import com.github.seunghyeon_tak.price_comparison.common.dto.api.response.price_alerts.PriceAlertsDto;
 import com.github.seunghyeon_tak.price_comparison.common.exception.ApiException;
 import com.github.seunghyeon_tak.price_comparison.common.exception.response.enums.price_alert.PriceAlertResponseCode;
 import org.junit.jupiter.api.DisplayName;
@@ -11,6 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -18,10 +22,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -43,6 +48,19 @@ class PriceAlertsApiControllerTest {
         Authentication authentication = new UsernamePasswordAuthenticationToken(String.valueOf(userId), null);
         context.setAuthentication(authentication);
         SecurityContextHolder.setContext(context);
+    }
+
+    private PriceAlertsDto sampleAlert() {
+        return PriceAlertsDto.builder()
+                .id(1L)
+                .productId(2L)
+                .productName("테스트 상품")
+                .productImageUrl("https://example.com")
+                .latestPrice(BigDecimal.valueOf(10000))
+                .targetPrice(BigDecimal.valueOf(5000))
+                .isActive(true)
+                .createdAt(LocalDateTime.now())
+                .build();
     }
 
     @Test
@@ -139,6 +157,60 @@ class PriceAlertsApiControllerTest {
                 .andDo(print());
 
         verify(priceAlertsApiBusiness).deactivatePriceAlert(userId, productId);
+    }
+
+    @Test
+    @DisplayName("가격 알림 리스트 조회")
+    void test5() throws Exception {
+        // given
+        Long userId = 1L;
+        Page<PriceAlertsDto> mockPage = new PageImpl<>(List.of(sampleAlert()));
+        userSecurityContext(userId);
+        when(priceAlertsApiBusiness.getPriceAlerts(any(Pageable.class), eq(userId))).thenReturn(mockPage);
+
+        // when & then
+        mockMvc.perform(get("/api/v1/price-alerts")
+                        .param("page", "0")
+                        .param("size", "10")
+                        .param("sort", "createdAt,DESC"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.result.resultCode").value(200))
+                .andExpect(jsonPath("$.result.resultMessage").value("success"))
+                .andExpect(jsonPath("$.result.resultDescription").value("success"))
+                .andExpect(jsonPath("$.data.content[0].productName").value("테스트 상품"))
+                .andExpect(jsonPath("$.data.content[0].latestPrice").value(10000))
+                .andExpect(jsonPath("$.data.content[0].targetPrice").value(5000))
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("가격 알림 리스트 데이터 없음")
+    void test6() throws Exception {
+        // given
+        Long userId = 1L;
+        userSecurityContext(userId);
+        Page<PriceAlertsDto> emptyPage = new PageImpl<>(List.of());
+        when(priceAlertsApiBusiness.getPriceAlerts(any(Pageable.class), eq(userId))).thenReturn(emptyPage);
+
+        // when & then
+        mockMvc.perform(get("/api/v1/price-alerts")
+                        .param("page", "0")
+                        .param("size", "10")
+                        .param("sort", "createdAt,DESC"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.content").isArray())
+                .andExpect(jsonPath("$.data.content").isEmpty());
+    }
+
+    @Test
+    @DisplayName("가격 알림 리스트 조회 음수페이지일때")
+    void test7() throws Exception {
+        userSecurityContext(1L);
+        mockMvc.perform(get("/api/v1/price-alerts")
+                        .param("page", "-1")
+                        .param("size", "10")
+                        .param("sort", "createdAt,DESC"))
+                .andExpect(status().isBadRequest());
     }
 
 }
