@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 
 public interface PriceAlertsRepository extends JpaRepository<PriceAlertsEntity, Long>, PriceAlertsRepositoryCustom {
@@ -16,4 +17,6 @@ public interface PriceAlertsRepository extends JpaRepository<PriceAlertsEntity, 
     Optional<PriceAlertsEntity> findByUserAndProductAndIsActive(UserEntity user, ProductEntity product, boolean isActive);
 
     Page<PriceAlertsEntity> findByUserAndIsActiveTrue(UserEntity user, Pageable pageable);
+
+    List<PriceAlertsEntity> findByIsActiveTrue();
 }
