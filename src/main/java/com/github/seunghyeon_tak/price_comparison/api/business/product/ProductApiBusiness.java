@@ -10,6 +10,7 @@ import com.github.seunghyeon_tak.price_comparison.common.annotation.LogException
 import com.github.seunghyeon_tak.price_comparison.common.dto.api.response.product.ProductDetailDto;
 import com.github.seunghyeon_tak.price_comparison.common.dto.api.response.product.ProductPriceDto;
 import com.github.seunghyeon_tak.price_comparison.common.dto.api.response.product.ProductsDto;
+import com.github.seunghyeon_tak.price_comparison.core.redis.RedisProductPriceCacheService;
 import com.github.seunghyeon_tak.price_comparison.db.domain.ProductEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -26,6 +27,7 @@ public class ProductApiBusiness {
     private final ProductApiConverter productApiConverter;
     private final ProductImageApiService productImageApiService;
     private final ProductPriceApiService productPriceApiService;
+    private final RedisProductPriceCacheService redisProductPriceCacheService;
 
     @BusinessLoggable("상품 목록 비지니스")
     @LogException
@@ -51,17 +53,24 @@ public class ProductApiBusiness {
         List<String> imageUrls = productImageApiService.getProductImages(productId);
         List<ProductPriceDto> productPriceDtoList = productPriceApiService.getProductPriceDto(productId);
 
-        Integer lowestPrice = productPriceDtoList.stream()
-                .map(ProductPriceDto::getPrice)
-                .min(Integer::compareTo)
-                .orElse(0);
+        // redis에서 최저가 검색
+        BigDecimal cachePrice = productPriceApiService.getCachePrice(productId);
+        if (cachePrice == null) {
+            cachePrice = productPriceDtoList.stream()
+                    .map(dto -> new BigDecimal(dto.getPrice()))
+                    .min(BigDecimal::compareTo)
+                    .orElse(BigDecimal.ZERO);
+
+            // 캐시 저장
+            productPriceApiService.cachePrice(productId, cachePrice);
+        }
 
         return productApiConverter.toDetailResponse(
                 productEntity,
                 categoryName,
                 imageUrls,
                 productPriceDtoList,
-                lowestPrice
+                cachePrice.intValue()
         );
     }
 }
