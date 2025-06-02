@@ -2,6 +2,7 @@ package com.github.seunghyeon_tak.price_comparison.api.service.product;
 
 import com.github.seunghyeon_tak.price_comparison.common.exception.ApiException;
 import com.github.seunghyeon_tak.price_comparison.common.exception.response.enums.product.ProductResponseCode;
+import com.github.seunghyeon_tak.price_comparison.core.redis.RedisProductPriceCacheService;
 import com.github.seunghyeon_tak.price_comparison.db.domain.ProductEntity;
 import com.github.seunghyeon_tak.price_comparison.db.repository.product.ProductRepository;
 import lombok.RequiredArgsConstructor;
