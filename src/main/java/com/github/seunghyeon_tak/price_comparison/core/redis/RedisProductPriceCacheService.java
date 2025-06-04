@@ -11,11 +11,13 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class RedisProductPriceCacheService {
     private final RedisTemplate<String, String> redisTemplate;
+    private final RedisCacheProperties redisCacheProperties;
     private static final String PREFIX = "product:latest-price:";
 
     public void setLatestPrice(Long productId, BigDecimal price) {
         String key = PREFIX + productId;
-        redisTemplate.opsForValue().set(key, price.toString(), 10, TimeUnit.MINUTES);
+        int ttlMinutes = redisCacheProperties.getProductPriceTtlMinutes();
+        redisTemplate.opsForValue().set(key, price.toString(), ttlMinutes, TimeUnit.MINUTES);
     }
 
     public BigDecimal getLatestPrice(Long productId) {
