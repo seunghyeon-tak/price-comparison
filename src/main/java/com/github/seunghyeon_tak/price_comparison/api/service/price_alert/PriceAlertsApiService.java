@@ -3,6 +3,7 @@ package com.github.seunghyeon_tak.price_comparison.api.service.price_alert;
 import com.github.seunghyeon_tak.price_comparison.common.dto.api.response.price_alerts.PriceAlertsDto;
 import com.github.seunghyeon_tak.price_comparison.common.exception.ApiException;
 import com.github.seunghyeon_tak.price_comparison.common.exception.response.enums.price_alert.PriceAlertResponseCode;
+import com.github.seunghyeon_tak.price_comparison.core.redis.RedisProductPriceCacheService;
 import com.github.seunghyeon_tak.price_comparison.db.domain.PriceAlertsEntity;
 import com.github.seunghyeon_tak.price_comparison.db.domain.ProductEntity;
 import com.github.seunghyeon_tak.price_comparison.db.domain.UserEntity;
@@ -19,6 +20,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class PriceAlertsApiService {
     private final PriceAlertsRepository priceAlertsRepository;
+    private final RedisProductPriceCacheService redisProductPriceCacheService;
 
     public void checkDuplicateAlert(UserEntity user, ProductEntity product, BigDecimal targetPrice) {
         priceAlertsRepository.findByUserAndProductAndTargetPriceAndIsActive(user, product, targetPrice, true)
