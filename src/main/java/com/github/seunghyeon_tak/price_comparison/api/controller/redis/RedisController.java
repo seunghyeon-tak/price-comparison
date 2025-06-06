@@ -1,11 +1,13 @@
 package com.github.seunghyeon_tak.price_comparison.api.controller.redis;
 
 import com.github.seunghyeon_tak.price_comparison.core.redis.RedisProductPriceCacheService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 
+@Tag(name = "Redis API", description = "가격 최신화 관련 Redis API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/redis")
