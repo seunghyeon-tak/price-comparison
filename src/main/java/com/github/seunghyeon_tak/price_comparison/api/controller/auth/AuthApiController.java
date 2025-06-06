@@ -9,6 +9,7 @@ import com.github.seunghyeon_tak.price_comparison.common.dto.api.response.user.U
 import com.github.seunghyeon_tak.price_comparison.common.dto.api.response.user.UserLoginResponse;
 import com.github.seunghyeon_tak.price_comparison.common.exception.response.Api;
 import com.github.seunghyeon_tak.price_comparison.common.util.CookieUtils;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.web.bind.annotation.*;
 
+@Tag(name = "Auth API", description = "인증 관련 API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/auth")
