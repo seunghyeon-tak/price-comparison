@@ -7,16 +7,17 @@ import com.github.seunghyeon_tak.price_comparison.common.dto.api.request.user.Us
 import com.github.seunghyeon_tak.price_comparison.common.dto.api.request.user.UserWishlistRequest;
 import com.github.seunghyeon_tak.price_comparison.common.dto.api.response.user.UserFavoritesProductDto;
 import com.github.seunghyeon_tak.price_comparison.common.exception.response.Api;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+@Tag(name = "User API", description = "사용자 관련 API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/user")

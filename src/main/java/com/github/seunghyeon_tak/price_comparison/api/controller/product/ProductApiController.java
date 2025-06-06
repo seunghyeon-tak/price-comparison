@@ -5,12 +5,14 @@ import com.github.seunghyeon_tak.price_comparison.common.annotation.ControllerLo
 import com.github.seunghyeon_tak.price_comparison.common.dto.api.response.product.ProductDetailDto;
 import com.github.seunghyeon_tak.price_comparison.common.dto.api.response.product.ProductsDto;
 import com.github.seunghyeon_tak.price_comparison.common.exception.response.Api;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
+@Tag(name = "Product API", description = "상품 관련 API")
 @RestController
 @RequestMapping("/api/v1/products")
 @RequiredArgsConstructor

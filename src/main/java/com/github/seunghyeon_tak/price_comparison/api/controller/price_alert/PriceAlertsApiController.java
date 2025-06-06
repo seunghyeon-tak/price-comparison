@@ -5,6 +5,7 @@ import com.github.seunghyeon_tak.price_comparison.common.annotation.ControllerLo
 import com.github.seunghyeon_tak.price_comparison.common.dto.api.request.price_alert.PriceAlertsRequest;
 import com.github.seunghyeon_tak.price_comparison.common.dto.api.response.price_alerts.PriceAlertsDto;
 import com.github.seunghyeon_tak.price_comparison.common.exception.response.Api;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -12,6 +13,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+@Tag(name = "Price Alert API", description = "가격 알림 관련 API")
 @RestController
 @RequestMapping("/api/v1/price-alerts")
 @RequiredArgsConstructor
