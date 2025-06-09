@@ -8,6 +8,7 @@ import com.github.seunghyeon_tak.price_comparison.common.dto.api.request.price_a
 import com.github.seunghyeon_tak.price_comparison.common.dto.api.response.price_alerts.PriceAlertsDto;
 import com.github.seunghyeon_tak.price_comparison.common.exception.ApiException;
 import com.github.seunghyeon_tak.price_comparison.common.exception.response.enums.price_alert.PriceAlertResponseCode;
+import com.github.seunghyeon_tak.price_comparison.core.redis.RedisProductPriceCacheService;
 import com.github.seunghyeon_tak.price_comparison.db.domain.PriceAlertsEntity;
 import com.github.seunghyeon_tak.price_comparison.db.domain.ProductEntity;
 import com.github.seunghyeon_tak.price_comparison.db.domain.UserEntity;
@@ -51,6 +52,9 @@ class PriceAlertsApiBusinessTest {
     @Mock
     private ProductApiService productApiService;
 
+    @Mock
+    private RedisProductPriceCacheService redisProductPriceCacheService;
+
     @Test
     @DisplayName("상품 가격 알림 등록 성공")
     void test1() {
@@ -80,6 +84,7 @@ class PriceAlertsApiBusinessTest {
         verify(priceAlertsApiService).checkDuplicateAlert(user, product, request.getTargetPrice());
         verify(priceAlertsApiConverter).toEntity(user, product, request);
         verify(priceAlertsApiService).createAlert(priceAlertsEntity);
+        verify(redisProductPriceCacheService).deleteKey(productId);
     }
 
     @Test
