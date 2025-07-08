@@ -97,3 +97,10 @@ tasks.named('bootRun') {
     jvmArgs = ['-Dfile.encoding=UTF-8']
 }
 
+sourceSets {
+    test {
+        resources {
+            srcDirs = ['src/test/resources']
+        }
+    }
+}
