@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  mysql:
+    ports:
+      - "3306:3306"
+    volumes:
+      - ../docker/mysql/data:/var/lib/mysql
+  spring-app:
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./logs:/app/logs
+    env_file:
+      - ./env/.env.local
