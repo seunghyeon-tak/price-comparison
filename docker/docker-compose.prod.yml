@@ -14,8 +14,26 @@ services:
       - "6379:6379"
 
   spring-app:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    container_name: price_comparison_spring
+    restart: always
     env_file:
-      - ../env/.env.prod
+      - ../env/.env.local
     ports:
       - "8080:8080"
+    depends_on:
+      - mysql
+      - redis
+    networks:
+      - app_network
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    volumes:
+      - ../logs:/app/logs
 
