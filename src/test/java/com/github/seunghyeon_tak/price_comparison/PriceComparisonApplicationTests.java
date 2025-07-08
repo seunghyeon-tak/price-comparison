@@ -7,7 +7,6 @@ import org.springframework.test.context.TestPropertySource;
 
 @SpringBootTest
 @ActiveProfiles("test")
-@TestPropertySource(properties = "spring.flyway.enabled=false")
 class PriceComparisonApplicationTests {
 
 	@Test
