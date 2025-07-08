@@ -5,7 +5,6 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
@@ -19,14 +18,10 @@ public class JwtProvider {
     private final long accessTokenValidityInMs;
     private final long refreshTokenValidityInMs;
 
-    public JwtProvider(
-            @Value("${jwt.secret}") String secret,
-            @Value("${jwt.access-token-validity-in-ms}") long accessTokenValidityInMs,
-            @Value("${jwt.refresh-token-validity-in-ms}") long refreshTokenValidityInMs
-    ) {
-        this.key = Keys.hmacShaKeyFor(secret.getBytes());
-        this.accessTokenValidityInMs = accessTokenValidityInMs;
-        this.refreshTokenValidityInMs = refreshTokenValidityInMs;
+    public JwtProvider(JwtProperties jwtProperties) {
+        this.key = Keys.hmacShaKeyFor(jwtProperties.getSecret().getBytes());
+        this.accessTokenValidityInMs = jwtProperties.getAccessTokenValidityInMs();
+        this.refreshTokenValidityInMs = jwtProperties.getRefreshTokenValidityInMs();
     }
 
     public String generateAccessToken(Long userId, String email) {
