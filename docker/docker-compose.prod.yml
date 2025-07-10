@@ -1,18 +1,6 @@
 version: '3.8'
 
 services:
-  mysql:
-    env_file:
-      - ../env/.env.prod
-    volumes:
-      - /var/lib/pc_mysql:/var/lib/mysql
-    ports:
-      - "3306:3306"
-
-  redis:
-    ports:
-      - "6379:6379"
-
   spring-app:
     build:
       context: ..
@@ -25,9 +13,6 @@ services:
       - ../env/.env.prod
     ports:
       - "8080:8080"
-    depends_on:
-      - mysql
-      - redis
     networks:
       - app_network
     healthcheck:

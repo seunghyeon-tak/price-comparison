@@ -6,10 +6,7 @@ services:
       - "3306:3306"
     volumes:
       - ../docker/mysql/data:/var/lib/mysql
-  spring-app:
+
+  redis:
     ports:
-      - "8080:8080"
-    volumes:
-      - ./logs:/app/logs
-    env_file:
-      - ./env/.env.local
+      - "6379:6379"
