@@ -19,8 +19,10 @@ services:
       dockerfile: Dockerfile
     container_name: price_comparison_spring
     restart: always
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
     env_file:
-      - ../env/.env.local
+      - ../env/.env.prod
     ports:
       - "8080:8080"
     depends_on:
